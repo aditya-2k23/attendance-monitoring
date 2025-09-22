@@ -60,7 +60,7 @@ export default function StudentTabLayout() {
             />
           ),
         }}
-      />
+      />    
       <Tabs.Screen
         name="profile"
         options={{
