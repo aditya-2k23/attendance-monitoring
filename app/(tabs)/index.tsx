@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import "../globals.css";
 
-export default function Index() {
+export default function HomeTab() {
   const router = useRouter();
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -17,7 +18,7 @@ export default function Index() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
       >
         {/* Greeting Header */}
         <View className="flex-row justify-between items-center mt-5 mb-8">
@@ -118,29 +119,6 @@ export default function Index() {
           </View>
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View className="absolute bottom-0 left-0 right-0 bg-white flex-row justify-around py-3 pb-5 border-t border-gray-200">
-        <TouchableOpacity className="items-center flex-1">
-          <View className="w-6 h-6 bg-blue-500 rounded-xl mb-1" />
-          <Text className="text-xs text-blue-500 font-semibold">Home</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="items-center flex-1">
-          <View className="w-6 h-6 bg-gray-300 rounded-xl mb-1" />
-          <Text className="text-xs text-gray-600">Tasks</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="items-center flex-1">
-          <View className="w-6 h-6 bg-gray-300 rounded-xl mb-1" />
-          <Text className="text-xs text-gray-600">Classroom</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity className="items-center flex-1">
-          <View className="w-6 h-6 bg-gray-300 rounded-xl mb-1" />
-          <Text className="text-xs text-gray-600">Messages</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }
