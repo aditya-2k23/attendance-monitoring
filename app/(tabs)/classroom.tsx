@@ -1,4 +1,3 @@
-import React from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -7,7 +6,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import "../globals.css";
 
 export default function ClassroomTab() {
   return (
