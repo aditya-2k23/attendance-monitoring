@@ -4,7 +4,6 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -13,350 +12,135 @@ import {
 export default function Index() {
   const router = useRouter();
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-50">
       <StatusBar barStyle="dark-content" backgroundColor="#f5f7fa" />
       <ScrollView
-        style={styles.scrollView}
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}
       >
         {/* Greeting Header */}
-        <View style={styles.header}>
-          <View style={styles.greetingContainer}>
-            <Text style={styles.greetingText}>Hello Teacher</Text>
-            <Text style={styles.taskText}>
+        <View className="flex-row justify-between items-center mt-5 mb-8">
+          <View className="flex-1">
+            <Text className="text-2xl font-semibold text-gray-900 mb-1">
+              Hello Teacher
+            </Text>
+            <Text className="text-sm text-gray-600">
               You&apos;ve got{" "}
-              <Text style={styles.taskHighlight}>4 lectures</Text> today!
+              <Text className="text-blue-500 font-semibold">4 lectures</Text>{" "}
+              today!
             </Text>
           </View>
-          <View style={styles.profileContainer}>
-            <View style={styles.profileImage}>
-              <Text style={styles.profileInitial}>D</Text>
+          <View className="relative">
+            <View className="w-12 h-12 rounded-full bg-gray-300 justify-center items-center">
+              <Text className="text-lg font-semibold text-gray-600">D</Text>
             </View>
-            <View style={styles.notificationBadge}>
-              <Text style={styles.badgeText}>2</Text>
+            <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 justify-center items-center">
+              <Text className="text-xs text-white font-semibold">2</Text>
             </View>
           </View>
         </View>
 
         {/* Statistics Cards */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>6</Text>
-            <Text style={styles.statLabel}>Today&apos;s Classes</Text>
+        <View className="flex-row justify-between mb-8">
+          <View className="flex-1 bg-white rounded-xl p-5 mx-1.5 items-center shadow-md">
+            <Text className="text-3xl font-bold text-gray-900 mb-1">6</Text>
+            <Text className="text-sm text-gray-600 text-center">
+              Today&apos;s Classes
+            </Text>
           </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>156</Text>
-            <Text style={styles.statLabel}>Students Present</Text>
+          <View className="flex-1 bg-white rounded-xl p-5 mx-1.5 items-center shadow-md">
+            <Text className="text-3xl font-bold text-gray-900 mb-1">156</Text>
+            <Text className="text-sm text-gray-600 text-center">
+              Students Present
+            </Text>
           </View>
         </View>
 
         {/* Quick Actions */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <Text style={styles.sectionSubtitle}>Your running subjects</Text>
+        <View className="mb-8">
+          <Text className="text-xl font-semibold text-gray-900 mb-1">
+            Quick Actions
+          </Text>
+          <Text className="text-sm text-gray-600 mb-5">
+            Your running subjects
+          </Text>
 
-          <View style={styles.quickActionsGrid}>
-            <TouchableOpacity
-              style={[styles.actionCard, { backgroundColor: "#ff6b8a" }]}
-            >
-              <Text style={styles.actionCardTitle}>Today&apos;s Classes</Text>
+          <View className="flex-row flex-wrap justify-between">
+            <TouchableOpacity className="w-[48%] h-20 bg-pink-400 rounded-xl justify-center items-center mb-3 shadow-md">
+              <Text className="text-white text-sm font-semibold text-center">
+                Today&apos;s Classes
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.actionCard, { backgroundColor: "#e91e63" }]}
+              className="w-[48%] h-20 bg-pink-600 rounded-xl justify-center items-center mb-3 shadow-md"
               onPress={() => router.push("/attendance")}
             >
-              <Text style={styles.actionCardTitle}>Lecture Attendance</Text>
+              <Text className="text-white text-sm font-semibold text-center">
+                Lecture Attendance
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.actionCard, { backgroundColor: "#3f51b5" }]}
-            >
-              <Text style={styles.actionCardTitle}>Track Attendance</Text>
+            <TouchableOpacity className="w-[48%] h-20 bg-indigo-600 rounded-xl justify-center items-center mb-3 shadow-md">
+              <Text className="text-white text-sm font-semibold text-center">
+                Track Attendance
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Your Schedule */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Your schedule</Text>
-          <Text style={styles.sectionSubtitle}>Upcoming classes and tasks</Text>
+        <View className="mb-8">
+          <Text className="text-xl font-semibold text-gray-900 mb-1">
+            Your schedule
+          </Text>
+          <Text className="text-sm text-gray-600 mb-5">
+            Upcoming classes and tasks
+          </Text>
 
-          <View style={styles.scheduleCard}>
-            <View style={styles.scheduleHeader}>
-              <Text style={styles.scheduleSubject}>Physics</Text>
-              <Text style={styles.scheduleChapter}>Chapter: 4 - Force</Text>
+          <View className="bg-white rounded-xl p-5 shadow-md">
+            <View className="mb-4">
+              <Text className="text-lg font-semibold text-gray-900 mb-1">
+                Physics
+              </Text>
+              <Text className="text-sm text-gray-600">Chapter: 4 - Force</Text>
             </View>
-            <View style={styles.scheduleDetails}>
-              <View style={styles.scheduleTime}>
-                <Text style={styles.timeLabel}>09:30</Text>
-                <Text style={styles.timeSubtext}>Max. three</Text>
+            <View className="flex-row justify-between items-center">
+              <View className="items-start">
+                <Text className="text-base font-semibold text-gray-900">
+                  09:30
+                </Text>
+                <Text className="text-xs text-gray-600">Max. three</Text>
               </View>
-              <Text style={styles.roomInfo}>Hall room name</Text>
+              <Text className="text-sm text-gray-600">Hall room name</Text>
             </View>
           </View>
         </View>
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNavigation}>
-        <TouchableOpacity style={styles.navItem}>
-          <View style={styles.navIconActive} />
-          <Text style={styles.navLabelActive}>Home</Text>
+      <View className="absolute bottom-0 left-0 right-0 bg-white flex-row justify-around py-3 pb-5 border-t border-gray-200">
+        <TouchableOpacity className="items-center flex-1">
+          <View className="w-6 h-6 bg-blue-500 rounded-xl mb-1" />
+          <Text className="text-xs text-blue-500 font-semibold">Home</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
-          <View style={styles.navIcon} />
-          <Text style={styles.navLabel}>Tasks</Text>
+        <TouchableOpacity className="items-center flex-1">
+          <View className="w-6 h-6 bg-gray-300 rounded-xl mb-1" />
+          <Text className="text-xs text-gray-600">Tasks</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
-          <View style={styles.navIcon} />
-          <Text style={styles.navLabel}>Classroom</Text>
+        <TouchableOpacity className="items-center flex-1">
+          <View className="w-6 h-6 bg-gray-300 rounded-xl mb-1" />
+          <Text className="text-xs text-gray-600">Classroom</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
-          <View style={styles.navIcon} />
-          <Text style={styles.navLabel}>Messages</Text>
+        <TouchableOpacity className="items-center flex-1">
+          <View className="w-6 h-6 bg-gray-300 rounded-xl mb-1" />
+          <Text className="text-xs text-gray-600">Messages</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f7fa",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 100, // Space for bottom navigation
-  },
-  // Header styles
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  greetingContainer: {
-    flex: 1,
-  },
-  greetingText: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: 4,
-  },
-  taskText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  taskHighlight: {
-    color: "#007bff",
-    fontWeight: "600",
-  },
-  profileContainer: {
-    position: "relative",
-  },
-  profileImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#e0e0e0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  profileInitial: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#666",
-  },
-  notificationBadge: {
-    position: "absolute",
-    top: -4,
-    right: -4,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#ff4757",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  badgeText: {
-    fontSize: 12,
-    color: "white",
-    fontWeight: "600",
-  },
-  // Statistics Cards
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 30,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 6,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#1a1a1a",
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-  },
-  // Section styles
-  sectionContainer: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 20,
-  },
-  // Quick Actions
-  quickActionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  actionCard: {
-    width: "48%",
-    height: 80,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  actionCardTitle: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  // Schedule styles
-  scheduleCard: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  scheduleHeader: {
-    marginBottom: 16,
-  },
-  scheduleSubject: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: 4,
-  },
-  scheduleChapter: {
-    fontSize: 14,
-    color: "#666",
-  },
-  scheduleDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  scheduleTime: {
-    alignItems: "flex-start",
-  },
-  timeLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1a1a1a",
-  },
-  timeSubtext: {
-    fontSize: 12,
-    color: "#666",
-  },
-  roomInfo: {
-    fontSize: 14,
-    color: "#666",
-  },
-  // Bottom Navigation
-  bottomNavigation: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 12,
-    paddingBottom: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-  navItem: {
-    alignItems: "center",
-    flex: 1,
-  },
-  navIcon: {
-    width: 24,
-    height: 24,
-    backgroundColor: "#ccc",
-    borderRadius: 12,
-    marginBottom: 4,
-  },
-  navIconActive: {
-    width: 24,
-    height: 24,
-    backgroundColor: "#007bff",
-    borderRadius: 12,
-    marginBottom: 4,
-  },
-  navLabel: {
-    fontSize: 12,
-    color: "#666",
-  },
-  navLabelActive: {
-    fontSize: 12,
-    color: "#007bff",
-    fontWeight: "600",
-  },
-});

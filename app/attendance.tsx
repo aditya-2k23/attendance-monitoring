@@ -4,7 +4,6 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -89,25 +88,29 @@ export default function AttendancePage() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-slate-50">
       <StatusBar barStyle="dark-content" backgroundColor="#f5f7fa" />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center justify-between px-5 py-4 bg-white border-b border-gray-200">
         <TouchableOpacity
-          style={styles.backButton}
+          className="w-10 h-10 rounded-full bg-gray-100 justify-center items-center"
           onPress={() => router.back()}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Text className="text-xl text-gray-700">←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Lecture Attendance</Text>
-        <View style={styles.headerRight} />
+        <Text className="text-lg font-semibold text-gray-900">
+          Lecture Attendance
+        </Text>
+        <View className="w-10" />
       </View>
 
       {/* Date and Summary */}
-      <View style={styles.summaryContainer}>
-        <Text style={styles.dateText}>Today, September 22, 2025</Text>
-        <Text style={styles.summaryText}>
+      <View className="bg-white px-5 py-4 border-b border-gray-200">
+        <Text className="text-base font-semibold text-gray-900 mb-1">
+          Today, September 22, 2025
+        </Text>
+        <Text className="text-sm text-gray-600">
           {todaysClasses.length} Classes •{" "}
           {todaysClasses.filter((c) => c.status === "completed").length}{" "}
           Completed
@@ -115,66 +118,69 @@ export default function AttendancePage() {
       </View>
 
       <ScrollView
-        style={styles.scrollView}
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
       >
         {/* Classes List */}
-        <View style={styles.classesList}>
+        <View className="mb-8">
           {todaysClasses.map((classItem) => (
             <TouchableOpacity
               key={classItem.id}
-              style={[
-                styles.classCard,
-                selectedClass === classItem.id && styles.selectedClassCard,
-              ]}
+              className={`bg-white rounded-xl p-4 mb-3 shadow-md ${
+                selectedClass === classItem.id ? "border-2 border-blue-500" : ""
+              }`}
               onPress={() =>
                 setSelectedClass(
                   selectedClass === classItem.id ? null : classItem.id
                 )
               }
             >
-              <View style={styles.classHeader}>
-                <View style={styles.classInfo}>
-                  <Text style={styles.subjectName}>{classItem.subject}</Text>
-                  <Text style={styles.chapterName}>{classItem.chapter}</Text>
+              <View className="flex-row justify-between items-start mb-3">
+                <View className="flex-1">
+                  <Text className="text-base font-semibold text-gray-900 mb-1">
+                    {classItem.subject}
+                  </Text>
+                  <Text className="text-sm text-gray-600">
+                    {classItem.chapter}
+                  </Text>
                 </View>
                 <View
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: getStatusColor(classItem.status) },
-                  ]}
+                  className="px-2 py-1 rounded-xl"
+                  style={{ backgroundColor: getStatusColor(classItem.status) }}
                 >
-                  <Text style={styles.statusText}>
+                  <Text className="text-xs text-white font-semibold">
                     {getStatusText(classItem.status)}
                   </Text>
                 </View>
               </View>
 
-              <View style={styles.classDetails}>
-                <View style={styles.timeAndRoom}>
-                  <Text style={styles.timeText}>{classItem.time}</Text>
-                  <Text style={styles.roomText}>{classItem.room}</Text>
+              <View className="flex-row justify-between items-center">
+                <View className="flex-1">
+                  <Text className="text-sm font-medium text-gray-900">
+                    {classItem.time}
+                  </Text>
+                  <Text className="text-xs text-gray-600 mt-0.5">
+                    {classItem.room}
+                  </Text>
                 </View>
 
-                <View style={styles.attendanceInfo}>
-                  <Text style={styles.attendanceText}>
+                <View className="items-end">
+                  <Text className="text-sm text-gray-600">
                     {classItem.presentStudents}/{classItem.totalStudents}{" "}
                     Present
                   </Text>
                   <Text
-                    style={[
-                      styles.percentageText,
-                      {
-                        color:
-                          calculateAttendancePercentage(
-                            classItem.presentStudents,
-                            classItem.totalStudents
-                          ) >= 80
-                            ? "#4caf50"
-                            : "#ff5722",
-                      },
-                    ]}
+                    className="text-base font-semibold mt-0.5"
+                    style={{
+                      color:
+                        calculateAttendancePercentage(
+                          classItem.presentStudents,
+                          classItem.totalStudents
+                        ) >= 80
+                          ? "#4caf50"
+                          : "#ff5722",
+                    }}
                   >
                     {calculateAttendancePercentage(
                       classItem.presentStudents,
@@ -187,16 +193,20 @@ export default function AttendancePage() {
 
               {/* Expanded Details */}
               {selectedClass === classItem.id && (
-                <View style={styles.expandedDetails}>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Absent Students:</Text>
-                    <Text style={styles.detailValue}>
+                <View className="mt-4 pt-4 border-t border-gray-200">
+                  <View className="flex-row justify-between mb-2">
+                    <Text className="text-sm text-gray-600">
+                      Absent Students:
+                    </Text>
+                    <Text className="text-sm font-medium text-gray-900">
                       {classItem.totalStudents - classItem.presentStudents}
                     </Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Attendance Rate:</Text>
-                    <Text style={styles.detailValue}>
+                  <View className="flex-row justify-between">
+                    <Text className="text-sm text-gray-600">
+                      Attendance Rate:
+                    </Text>
+                    <Text className="text-sm font-medium text-gray-900">
                       {calculateAttendancePercentage(
                         classItem.presentStudents,
                         classItem.totalStudents
@@ -205,19 +215,14 @@ export default function AttendancePage() {
                     </Text>
                   </View>
 
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity style={styles.actionButton}>
-                      <Text style={styles.actionButtonText}>View Details</Text>
+                  <View className="flex-row mt-3 gap-2">
+                    <TouchableOpacity className="flex-1 py-2.5 px-4 rounded-lg border border-blue-500 items-center">
+                      <Text className="text-sm text-blue-500 font-medium">
+                        View Details
+                      </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.primaryButton]}
-                    >
-                      <Text
-                        style={[
-                          styles.actionButtonText,
-                          styles.primaryButtonText,
-                        ]}
-                      >
+                    <TouchableOpacity className="flex-1 py-2.5 px-4 rounded-lg bg-blue-500 items-center">
+                      <Text className="text-sm text-white font-medium">
                         Mark Attendance
                       </Text>
                     </TouchableOpacity>
@@ -229,23 +234,29 @@ export default function AttendancePage() {
         </View>
 
         {/* Summary Stats */}
-        <View style={styles.summaryStats}>
-          <Text style={styles.statsTitle}>Today&apos;s Summary</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
+        <View className="bg-white rounded-xl p-5 shadow-md">
+          <Text className="text-lg font-semibold text-gray-900 mb-4">
+            Today&apos;s Summary
+          </Text>
+          <View className="flex-row justify-between">
+            <View className="items-center flex-1">
+              <Text className="text-2xl font-bold text-blue-500 mb-1">
                 {todaysClasses.reduce((sum, c) => sum + c.presentStudents, 0)}
               </Text>
-              <Text style={styles.statLabel}>Total Present</Text>
+              <Text className="text-xs text-gray-600 text-center">
+                Total Present
+              </Text>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
+            <View className="items-center flex-1">
+              <Text className="text-2xl font-bold text-blue-500 mb-1">
                 {todaysClasses.reduce((sum, c) => sum + c.totalStudents, 0)}
               </Text>
-              <Text style={styles.statLabel}>Total Students</Text>
+              <Text className="text-xs text-gray-600 text-center">
+                Total Students
+              </Text>
             </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
+            <View className="items-center flex-1">
+              <Text className="text-2xl font-bold text-blue-500 mb-1">
                 {Math.round(
                   (todaysClasses.reduce(
                     (sum, c) => sum + c.presentStudents,
@@ -259,7 +270,9 @@ export default function AttendancePage() {
                 )}
                 %
               </Text>
-              <Text style={styles.statLabel}>Overall Rate</Text>
+              <Text className="text-xs text-gray-600 text-center">
+                Overall Rate
+              </Text>
             </View>
           </View>
         </View>
@@ -267,227 +280,3 @@ export default function AttendancePage() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f7fa",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backButtonText: {
-    fontSize: 20,
-    color: "#333",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1a1a1a",
-  },
-  headerRight: {
-    width: 40,
-  },
-  summaryContainer: {
-    backgroundColor: "white",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  dateText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: 4,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  classesList: {
-    marginBottom: 30,
-  },
-  classCard: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  selectedClassCard: {
-    borderWidth: 2,
-    borderColor: "#007bff",
-  },
-  classHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 12,
-  },
-  classInfo: {
-    flex: 1,
-  },
-  subjectName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: 4,
-  },
-  chapterName: {
-    fontSize: 14,
-    color: "#666",
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    color: "white",
-    fontWeight: "600",
-  },
-  classDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  timeAndRoom: {
-    flex: 1,
-  },
-  timeText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#1a1a1a",
-  },
-  roomText: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
-  },
-  attendanceInfo: {
-    alignItems: "flex-end",
-  },
-  attendanceText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  percentageText: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginTop: 2,
-  },
-  expandedDetails: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#1a1a1a",
-  },
-  actionButtons: {
-    flexDirection: "row",
-    marginTop: 12,
-    gap: 8,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#007bff",
-    alignItems: "center",
-  },
-  primaryButton: {
-    backgroundColor: "#007bff",
-  },
-  actionButtonText: {
-    fontSize: 14,
-    color: "#007bff",
-    fontWeight: "500",
-  },
-  primaryButtonText: {
-    color: "white",
-  },
-  summaryStats: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  statsTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: 16,
-  },
-  statsGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  statItem: {
-    alignItems: "center",
-    flex: 1,
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#007bff",
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "#666",
-    textAlign: "center",
-  },
-});
