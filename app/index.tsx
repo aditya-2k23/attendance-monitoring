@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import { useAuth } from "./contexts/AuthContext";
 
 export default function Index() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   // Show loading screen while checking auth state
   if (isLoading) {
@@ -14,9 +14,15 @@ export default function Index() {
     );
   }
 
-  // Redirect based on authentication state
-  if (isAuthenticated) {
-    return <Redirect href="/(tabs)" />;
+  // Redirect based on authentication state and user role
+  if (isAuthenticated && user) {
+    // Route to appropriate interface based on user role
+    if (user.role === 'student') {
+      return <Redirect href="/(student-tabs)" />;
+    } else {
+      // Teachers, admins, and other roles go to regular tabs
+      return <Redirect href="/(tabs)" />;
+    }
   } else {
     return <Redirect href="/auth/login" />;
   }
