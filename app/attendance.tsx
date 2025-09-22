@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -8,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { io, Socket } from "socket.io-client";
 
 // Mock data for today's classes
 const todaysClasses = [
@@ -56,6 +58,56 @@ const todaysClasses = [
 export default function AttendancePage() {
   const router = useRouter();
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    // For Expo, use your computer's IP address instead of localhost
+    // You can find it by running `expo start` and looking at the QR code URL
+    // Or use 'http://192.168.x.x:3001' (replace with your actual IP)
+    // const socketConnection = io("http://10.0.2.2:3001"); // Android emulator
+    const socketConnection = io("http://192.168.31.167:3001"); // Use your actual IP for physical device
+
+    socketConnection.on("connect", () => {
+      console.log("Connected to server");
+      setConnected(true);
+    });
+
+    socketConnection.on("disconnect", () => {
+      console.log("Disconnected from server");
+      setConnected(false);
+    });
+
+    socketConnection.on("connect_error", (error) => {
+      console.error("Connection error:", error);
+      Alert.alert(
+        "Connection Error",
+        "Could not connect to server. Make sure it's running and check the IP address"
+      );
+    });
+
+    setSocket(socketConnection);
+
+    // Cleanup on component unmount
+    return () => {
+      socketConnection.disconnect();
+    };
+  }, []);
+
+  const handleButtonClick = () => {
+    if (!socket || !connected) {
+      Alert.alert("Not Connected", "Please make sure the server is running");
+      return;
+    }
+
+    // Send event to server
+    socket.emit("button-clicked", {
+      start: true,
+      timestamp: new Date().toISOString(),
+    });
+
+    console.log("Button clicked event sent");
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -221,7 +273,10 @@ export default function AttendancePage() {
                         View Details
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity className="flex-1 py-2.5 px-4 rounded-lg bg-blue-500 items-center">
+                    <TouchableOpacity
+                      onPress={handleButtonClick}
+                      className="flex-1 py-2.5 px-4 rounded-lg bg-blue-500 items-center"
+                    >
                       <Text className="text-sm text-white font-medium">
                         Mark Attendance
                       </Text>
