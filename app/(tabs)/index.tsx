@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import "../globals.css";
 
 export default function HomeTab() {
   const router = useRouter();
