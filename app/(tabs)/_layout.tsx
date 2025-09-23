@@ -156,6 +156,19 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="admin"
+        options={{
+          title: "Admin",
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialIcons
+              name={focused ? "admin-panel-settings" : "admin-panel-settings"}
+              size={size || 24}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
