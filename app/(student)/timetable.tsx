@@ -1,52 +1,152 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import "../globals.css";
 
 // Complete weekly timetable data
 const weeklyTimetable = {
   Monday: [
-    { time: "09:00-10:00", subject: "Physics", instructor: "Dr. Smith", room: "LH-01", type: "Lecture", color: "bg-blue-500" },
-    { time: "11:00-12:00", subject: "Mathematics", instructor: "Prof. Johnson", room: "LH-05", type: "Lecture", color: "bg-green-500" },
-    { time: "14:00-15:00", subject: "Computer Lab", instructor: "Dr. Davis", room: "Lab-3", type: "Practical", color: "bg-purple-500" },
+    {
+      time: "09:00-10:00",
+      subject: "Physics",
+      instructor: "Dr. Smith",
+      room: "LH-01",
+      type: "Lecture",
+      color: "bg-blue-500",
+    },
+    {
+      time: "11:00-12:00",
+      subject: "Mathematics",
+      instructor: "Prof. Johnson",
+      room: "LH-05",
+      type: "Lecture",
+      color: "bg-green-500",
+    },
+    {
+      time: "14:00-15:00",
+      subject: "Computer Lab",
+      instructor: "Dr. Davis",
+      room: "Lab-3",
+      type: "Practical",
+      color: "bg-purple-500",
+    },
   ],
   Tuesday: [
-    { time: "10:00-11:00", subject: "Chemistry", instructor: "Dr. Brown", room: "LH-02", type: "Lecture", color: "bg-red-500" },
-    { time: "15:00-16:00", subject: "Physics Lab", instructor: "Dr. Smith", room: "Lab-1", type: "Practical", color: "bg-blue-500" },
+    {
+      time: "10:00-11:00",
+      subject: "Chemistry",
+      instructor: "Dr. Brown",
+      room: "LH-02",
+      type: "Lecture",
+      color: "bg-red-500",
+    },
+    {
+      time: "15:00-16:00",
+      subject: "Physics Lab",
+      instructor: "Dr. Smith",
+      room: "Lab-1",
+      type: "Practical",
+      color: "bg-blue-500",
+    },
   ],
   Wednesday: [
-    { time: "09:00-10:00", subject: "Mathematics", instructor: "Prof. Johnson", room: "LH-05", type: "Tutorial", color: "bg-green-500" },
-    { time: "11:00-12:00", subject: "Biology", instructor: "Prof. Wilson", room: "LH-03", type: "Lecture", color: "bg-yellow-500" },
-    { time: "14:00-15:00", subject: "Chemistry Lab", instructor: "Dr. Brown", room: "Lab-2", type: "Practical", color: "bg-red-500" },
+    {
+      time: "09:00-10:00",
+      subject: "Mathematics",
+      instructor: "Prof. Johnson",
+      room: "LH-05",
+      type: "Tutorial",
+      color: "bg-green-500",
+    },
+    {
+      time: "11:00-12:00",
+      subject: "Biology",
+      instructor: "Prof. Wilson",
+      room: "LH-03",
+      type: "Lecture",
+      color: "bg-yellow-500",
+    },
+    {
+      time: "14:00-15:00",
+      subject: "Chemistry Lab",
+      instructor: "Dr. Brown",
+      room: "Lab-2",
+      type: "Practical",
+      color: "bg-red-500",
+    },
   ],
   Thursday: [
-    { time: "10:00-11:00", subject: "Physics", instructor: "Dr. Smith", room: "LH-01", type: "Lecture", color: "bg-blue-500" },
-    { time: "12:00-13:00", subject: "Computer Science", instructor: "Dr. Davis", room: "LH-04", type: "Lecture", color: "bg-purple-500" },
+    {
+      time: "10:00-11:00",
+      subject: "Physics",
+      instructor: "Dr. Smith",
+      room: "LH-01",
+      type: "Lecture",
+      color: "bg-blue-500",
+    },
+    {
+      time: "12:00-13:00",
+      subject: "Computer Science",
+      instructor: "Dr. Davis",
+      room: "LH-04",
+      type: "Lecture",
+      color: "bg-purple-500",
+    },
   ],
   Friday: [
-    { time: "09:00-10:00", subject: "Biology", instructor: "Prof. Wilson", room: "LH-03", type: "Lecture", color: "bg-yellow-500" },
-    { time: "11:00-12:00", subject: "Mathematics", instructor: "Prof. Johnson", room: "LH-05", type: "Lecture", color: "bg-green-500" },
-    { time: "14:00-16:00", subject: "Project Work", instructor: "Dr. Davis", room: "Lab-3", type: "Project", color: "bg-indigo-500" },
+    {
+      time: "09:00-10:00",
+      subject: "Biology",
+      instructor: "Prof. Wilson",
+      room: "LH-03",
+      type: "Lecture",
+      color: "bg-yellow-500",
+    },
+    {
+      time: "11:00-12:00",
+      subject: "Mathematics",
+      instructor: "Prof. Johnson",
+      room: "LH-05",
+      type: "Lecture",
+      color: "bg-green-500",
+    },
+    {
+      time: "14:00-16:00",
+      subject: "Project Work",
+      instructor: "Dr. Davis",
+      room: "Lab-3",
+      type: "Project",
+      color: "bg-indigo-500",
+    },
   ],
   Saturday: [
-    { time: "10:00-12:00", subject: "Seminar", instructor: "Various", room: "Auditorium", type: "Seminar", color: "bg-pink-500" },
+    {
+      time: "10:00-12:00",
+      subject: "Seminar",
+      instructor: "Various",
+      room: "Auditorium",
+      type: "Seminar",
+      color: "bg-pink-500",
+    },
   ],
   Sunday: [],
 };
 
-const timeSlots = [
-  "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00",
-  "14:00-15:00", "15:00-16:00", "16:00-17:00"
+const days = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
-
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export default function StudentTimetable() {
   const [selectedDay, setSelectedDay] = useState("Monday");
@@ -78,7 +178,9 @@ export default function StudentTimetable() {
 
       {/* Header */}
       <View className="bg-white px-5 py-4 border-b border-gray-200">
-        <Text className="text-xl font-semibold text-gray-900">My Timetable</Text>
+        <Text className="text-xl font-semibold text-gray-900">
+          My Timetable
+        </Text>
         <Text className="text-sm text-gray-600 mt-1">
           Weekly class schedule
         </Text>
@@ -127,7 +229,8 @@ export default function StudentTimetable() {
                 No Classes Today
               </Text>
               <Text className="text-sm text-gray-600 text-center">
-                Enjoy your day off! Use this time to study, relax, or catch up on assignments.
+                Enjoy your day off! Use this time to study, relax, or catch up
+                on assignments.
               </Text>
             </View>
           ) : (
@@ -135,11 +238,13 @@ export default function StudentTimetable() {
               {getCurrentDayClasses().map((class_item, index) => (
                 <View key={index} className="bg-white rounded-xl p-4 shadow-md">
                   <View className="flex-row items-center mb-3">
-                    <View className={`w-10 h-10 rounded-full ${class_item.color} items-center justify-center mr-3`}>
-                      <MaterialIcons 
-                        name={getTypeIcon(class_item.type)} 
-                        size={20} 
-                        color="white" 
+                    <View
+                      className={`w-10 h-10 rounded-full ${class_item.color} items-center justify-center mr-3`}
+                    >
+                      <MaterialIcons
+                        name={getTypeIcon(class_item.type)}
+                        size={20}
+                        color="white"
                       />
                     </View>
                     <View className="flex-1">
@@ -160,18 +265,32 @@ export default function StudentTimetable() {
                     </View>
                   </View>
                   <View className="flex-row justify-between items-center">
-                    <View className={`px-2 py-1 rounded-lg ${
-                      class_item.type === 'Lecture' ? 'bg-blue-100' :
-                      class_item.type === 'Practical' ? 'bg-green-100' :
-                      class_item.type === 'Tutorial' ? 'bg-purple-100' :
-                      class_item.type === 'Project' ? 'bg-indigo-100' : 'bg-pink-100'
-                    }`}>
-                      <Text className={`text-xs font-medium ${
-                        class_item.type === 'Lecture' ? 'text-blue-700' :
-                        class_item.type === 'Practical' ? 'text-green-700' :
-                        class_item.type === 'Tutorial' ? 'text-purple-700' :
-                        class_item.type === 'Project' ? 'text-indigo-700' : 'text-pink-700'
-                      }`}>
+                    <View
+                      className={`px-2 py-1 rounded-lg ${
+                        class_item.type === "Lecture"
+                          ? "bg-blue-100"
+                          : class_item.type === "Practical"
+                            ? "bg-green-100"
+                            : class_item.type === "Tutorial"
+                              ? "bg-purple-100"
+                              : class_item.type === "Project"
+                                ? "bg-indigo-100"
+                                : "bg-pink-100"
+                      }`}
+                    >
+                      <Text
+                        className={`text-xs font-medium ${
+                          class_item.type === "Lecture"
+                            ? "text-blue-700"
+                            : class_item.type === "Practical"
+                              ? "text-green-700"
+                              : class_item.type === "Tutorial"
+                                ? "text-purple-700"
+                                : class_item.type === "Project"
+                                  ? "text-indigo-700"
+                                  : "text-pink-700"
+                        }`}
+                      >
                         {class_item.type}
                       </Text>
                     </View>
@@ -187,32 +306,37 @@ export default function StudentTimetable() {
           <Text className="text-lg font-semibold text-gray-900 mb-4">
             Weekly Overview
           </Text>
-          
+
           <View className="bg-white rounded-xl p-4 shadow-md">
             <View className="space-y-3">
               {days.map((day) => {
-                const dayClasses = weeklyTimetable[day as keyof typeof weeklyTimetable];
-                const classCount = Array.isArray(dayClasses) ? dayClasses.length : 0;
-                
+                const dayClasses =
+                  weeklyTimetable[day as keyof typeof weeklyTimetable];
+                const classCount = Array.isArray(dayClasses)
+                  ? dayClasses.length
+                  : 0;
+
                 return (
                   <TouchableOpacity
                     key={day}
                     className="flex-row justify-between items-center py-2"
                     onPress={() => setSelectedDay(day)}
                   >
-                    <Text className={`text-base font-medium ${
-                      selectedDay === day ? 'text-blue-600' : 'text-gray-900'
-                    }`}>
+                    <Text
+                      className={`text-base font-medium ${
+                        selectedDay === day ? "text-blue-600" : "text-gray-900"
+                      }`}
+                    >
                       {day}
                     </Text>
                     <View className="flex-row items-center">
                       <Text className="text-sm text-gray-600 mr-2">
                         {day === "Sunday" ? "Holiday" : `${classCount} classes`}
                       </Text>
-                      <MaterialIcons 
-                        name="chevron-right" 
-                        size={20} 
-                        color={selectedDay === day ? "#2563eb" : "#9ca3af"} 
+                      <MaterialIcons
+                        name="chevron-right"
+                        size={20}
+                        color={selectedDay === day ? "#2563eb" : "#9ca3af"}
                       />
                     </View>
                   </TouchableOpacity>
@@ -230,7 +354,11 @@ export default function StudentTimetable() {
           <View className="flex-row justify-between">
             <View className="items-center flex-1">
               <Text className="text-2xl font-bold text-blue-500">
-                {Object.values(weeklyTimetable).flat().filter(item => item && typeof item === 'object').length}
+                {
+                  Object.values(weeklyTimetable)
+                    .flat()
+                    .filter((item) => item && typeof item === "object").length
+                }
               </Text>
               <Text className="text-xs text-gray-600 text-center">
                 Total Classes
@@ -238,7 +366,16 @@ export default function StudentTimetable() {
             </View>
             <View className="items-center flex-1">
               <Text className="text-2xl font-bold text-green-500">
-                {Object.values(weeklyTimetable).flat().filter(item => item && typeof item === 'object' && item.type === 'Lecture').length}
+                {
+                  Object.values(weeklyTimetable)
+                    .flat()
+                    .filter(
+                      (item) =>
+                        item &&
+                        typeof item === "object" &&
+                        item.type === "Lecture"
+                    ).length
+                }
               </Text>
               <Text className="text-xs text-gray-600 text-center">
                 Lectures
@@ -246,7 +383,16 @@ export default function StudentTimetable() {
             </View>
             <View className="items-center flex-1">
               <Text className="text-2xl font-bold text-purple-500">
-                {Object.values(weeklyTimetable).flat().filter(item => item && typeof item === 'object' && item.type === 'Practical').length}
+                {
+                  Object.values(weeklyTimetable)
+                    .flat()
+                    .filter(
+                      (item) =>
+                        item &&
+                        typeof item === "object" &&
+                        item.type === "Practical"
+                    ).length
+                }
               </Text>
               <Text className="text-xs text-gray-600 text-center">
                 Practicals

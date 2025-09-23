@@ -1,14 +1,13 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import "../globals.css";
 
 // Mock student attendance data
 const attendanceData = {
@@ -110,7 +109,9 @@ const attendanceData = {
 };
 
 export default function StudentAttendance() {
-  const [selectedTab, setSelectedTab] = useState<"overview" | "subjects" | "history">("overview");
+  const [selectedTab, setSelectedTab] = useState<
+    "overview" | "subjects" | "history"
+  >("overview");
 
   const getAttendanceColor = (percentage: number) => {
     if (percentage >= 85) return "text-green-500";
@@ -134,9 +135,9 @@ export default function StudentAttendance() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { 
-      month: "short", 
-      day: "numeric" 
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -146,7 +147,9 @@ export default function StudentAttendance() {
 
       {/* Header */}
       <View className="bg-white px-5 py-4 border-b border-gray-200">
-        <Text className="text-xl font-semibold text-gray-900">My Attendance</Text>
+        <Text className="text-xl font-semibold text-gray-900">
+          My Attendance
+        </Text>
         <Text className="text-sm text-gray-600 mt-1">
           Track your attendance record
         </Text>
@@ -212,10 +215,14 @@ export default function StudentAttendance() {
               <Text className="text-lg font-semibold text-gray-900 mb-4">
                 Overall Attendance
               </Text>
-              
+
               <View className="items-center mb-4">
-                <View className={`w-32 h-32 rounded-full items-center justify-center ${getAttendanceBgColor(attendanceData.overall.percentage)}`}>
-                  <Text className={`text-3xl font-bold ${getAttendanceColor(attendanceData.overall.percentage)}`}>
+                <View
+                  className={`w-32 h-32 rounded-full items-center justify-center ${getAttendanceBgColor(attendanceData.overall.percentage)}`}
+                >
+                  <Text
+                    className={`text-3xl font-bold ${getAttendanceColor(attendanceData.overall.percentage)}`}
+                  >
                     {attendanceData.overall.percentage}%
                   </Text>
                   <Text className="text-sm text-gray-600 mt-1">Attendance</Text>
@@ -249,10 +256,12 @@ export default function StudentAttendance() {
                 </View>
               </View>
 
-              {attendanceData.overall.percentage < attendanceData.overall.target && (
+              {attendanceData.overall.percentage <
+                attendanceData.overall.target && (
                 <View className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
                   <Text className="text-sm text-red-600 font-medium">
-                    ⚠️ Warning: Your attendance is below the required minimum of {attendanceData.overall.target}%
+                    ⚠️ Warning: Your attendance is below the required minimum of{" "}
+                    {attendanceData.overall.target}%
                   </Text>
                 </View>
               )}
@@ -269,13 +278,19 @@ export default function StudentAttendance() {
               </View>
               <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
                 <MaterialIcons name="trending-up" size={24} color="#10b981" />
-                <Text className="text-lg font-bold text-gray-900 mt-2">+2%</Text>
+                <Text className="text-lg font-bold text-gray-900 mt-2">
+                  +2%
+                </Text>
                 <Text className="text-xs text-gray-600 text-center">
                   This Month
                 </Text>
               </View>
               <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-                <MaterialIcons name="calendar-month" size={24} color="#f59e0b" />
+                <MaterialIcons
+                  name="calendar-month"
+                  size={24}
+                  color="#f59e0b"
+                />
                 <Text className="text-lg font-bold text-gray-900 mt-2">18</Text>
                 <Text className="text-xs text-gray-600 text-center">
                   Days Left
@@ -288,7 +303,10 @@ export default function StudentAttendance() {
         {selectedTab === "subjects" && (
           <View className="space-y-4">
             {attendanceData.subjects.map((subject) => (
-              <View key={subject.id} className="bg-white rounded-xl p-4 shadow-md">
+              <View
+                key={subject.id}
+                className="bg-white rounded-xl p-4 shadow-md"
+              >
                 <View className="flex-row justify-between items-start mb-3">
                   <View className="flex-1">
                     <Text className="text-base font-semibold text-gray-900">
@@ -298,8 +316,12 @@ export default function StudentAttendance() {
                       {subject.instructor}
                     </Text>
                   </View>
-                  <View className={`px-3 py-1 rounded-full ${getAttendanceBgColor(subject.percentage)}`}>
-                    <Text className={`text-sm font-semibold ${getAttendanceColor(subject.percentage)}`}>
+                  <View
+                    className={`px-3 py-1 rounded-full ${getAttendanceBgColor(subject.percentage)}`}
+                  >
+                    <Text
+                      className={`text-sm font-semibold ${getAttendanceColor(subject.percentage)}`}
+                    >
                       {subject.percentage}%
                     </Text>
                   </View>
@@ -322,8 +344,8 @@ export default function StudentAttendance() {
                         subject.percentage >= 85
                           ? "bg-green-500"
                           : subject.percentage >= 75
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
+                            ? "bg-yellow-500"
+                            : "bg-red-500"
                       }`}
                       style={{ width: `${subject.percentage}%` }}
                     />
@@ -340,7 +362,10 @@ export default function StudentAttendance() {
               Recent Classes
             </Text>
             {attendanceData.recentClasses.map((class_item) => (
-              <View key={class_item.id} className="bg-white rounded-xl p-4 shadow-md">
+              <View
+                key={class_item.id}
+                className="bg-white rounded-xl p-4 shadow-md"
+              >
                 <View className="flex-row justify-between items-start">
                   <View className="flex-1">
                     <Text className="text-base font-semibold text-gray-900">
@@ -354,16 +379,22 @@ export default function StudentAttendance() {
                     </Text>
                   </View>
                   <View className="items-end">
-                    <View className={`w-8 h-8 rounded-full items-center justify-center ${getStatusColor(class_item.status)}`}>
+                    <View
+                      className={`w-8 h-8 rounded-full items-center justify-center ${getStatusColor(class_item.status)}`}
+                    >
                       <MaterialIcons
                         name={getStatusIcon(class_item.status)}
                         size={16}
                         color="white"
                       />
                     </View>
-                    <Text className={`text-xs font-medium mt-1 ${
-                      class_item.status === "present" ? "text-green-600" : "text-red-600"
-                    }`}>
+                    <Text
+                      className={`text-xs font-medium mt-1 ${
+                        class_item.status === "present"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
                       {class_item.status === "present" ? "Present" : "Absent"}
                     </Text>
                   </View>

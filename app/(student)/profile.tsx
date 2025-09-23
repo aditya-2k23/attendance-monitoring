@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Mock student profile data
 const studentProfile = {
@@ -85,7 +85,7 @@ const quickActions = [
 
 export default function StudentProfile() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const [selectedTab, setSelectedTab] = useState<
     "personal" | "academic" | "settings"
   >("personal");

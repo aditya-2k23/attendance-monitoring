@@ -1,59 +1,56 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
 import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
-import "../globals.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Subject-wise attendance data
 const subjectAttendance = [
-  { 
-    subject: "Physics", 
-    attended: 18, 
-    total: 20, 
+  {
+    subject: "Physics",
+    attended: 18,
+    total: 20,
     percentage: 90,
     color: "#3b82f6", // blue
-    instructor: "Dr. Smith"
+    instructor: "Dr. Smith",
   },
-  { 
-    subject: "Mathematics", 
-    attended: 16, 
-    total: 20, 
+  {
+    subject: "Mathematics",
+    attended: 16,
+    total: 20,
     percentage: 80,
     color: "#10b981", // green
-    instructor: "Prof. Johnson"
+    instructor: "Prof. Johnson",
   },
-  { 
-    subject: "Chemistry", 
-    attended: 17, 
-    total: 20, 
+  {
+    subject: "Chemistry",
+    attended: 17,
+    total: 20,
     percentage: 85,
     color: "#f59e0b", // yellow
-    instructor: "Dr. Brown"
+    instructor: "Dr. Brown",
   },
-  { 
-    subject: "Computer Science", 
-    attended: 19, 
-    total: 20, 
+  {
+    subject: "Computer Science",
+    attended: 19,
+    total: 20,
     percentage: 95,
     color: "#8b5cf6", // purple
-    instructor: "Dr. Davis"
+    instructor: "Dr. Davis",
   },
-  { 
-    subject: "Biology", 
-    attended: 15, 
-    total: 18, 
+  {
+    subject: "Biology",
+    attended: 15,
+    total: 18,
     percentage: 83,
     color: "#06b6d4", // cyan
-    instructor: "Prof. Wilson"
+    instructor: "Prof. Wilson",
   },
 ];
 
@@ -66,25 +63,25 @@ const todaysTimetable = [
     instructor: "Dr. Smith",
     room: "Hall room 101",
     type: "Lecture",
-    status: "completed"
+    status: "completed",
   },
   {
     time: "10:00-11:00",
-    subject: "Mathematics", 
+    subject: "Mathematics",
     chapter: "Calculus - Integration",
     instructor: "Prof. Johnson",
     room: "Hall room 205",
     type: "Tutorial",
-    status: "current"
+    status: "current",
   },
   {
     time: "11:00-12:00",
     subject: "Chemistry",
     chapter: "Organic Chemistry Lab",
-    instructor: "Dr. Brown", 
+    instructor: "Dr. Brown",
     room: "Lab 103",
     type: "Practical",
-    status: "upcoming"
+    status: "upcoming",
   },
   {
     time: "14:00-15:00",
@@ -92,8 +89,8 @@ const todaysTimetable = [
     chapter: "Data Structures",
     instructor: "Dr. Davis",
     room: "Lab 201",
-    type: "Practical", 
-    status: "upcoming"
+    type: "Practical",
+    status: "upcoming",
   },
 ];
 
@@ -101,31 +98,31 @@ const todaysTimetable = [
 const upcomingExams = [
   {
     subject: "Physics",
-    type: "Mid-term Exam", 
+    type: "Mid-term Exam",
     date: "2025-09-28",
     time: "10:00 AM",
     room: "Exam Hall A",
     marks: 100,
-    daysLeft: 6
+    daysLeft: 6,
   },
   {
     subject: "Mathematics",
     type: "Quiz",
-    date: "2025-09-25", 
+    date: "2025-09-25",
     time: "11:00 AM",
     room: "Hall room 205",
     marks: 25,
-    daysLeft: 3
+    daysLeft: 3,
   },
   {
-    subject: "Chemistry", 
+    subject: "Chemistry",
     type: "Lab Test",
     date: "2025-09-30",
-    time: "02:00 PM", 
+    time: "02:00 PM",
     room: "Lab 103",
     marks: 50,
-    daysLeft: 8
-  }
+    daysLeft: 8,
+  },
 ];
 
 const studentInfo = {
@@ -135,7 +132,7 @@ const studentInfo = {
   cgpa: 3.7,
   totalLectures: 98,
   attendedLectures: 87,
-  overallAttendance: 89
+  overallAttendance: 89,
 };
 
 // Circular Progress Component (React Native compatible)
@@ -145,21 +142,26 @@ interface CircularProgressProps {
   color?: string;
 }
 
-const CircularProgress: React.FC<CircularProgressProps> = ({ percentage, size = 80, color = "#3b82f6" }) => {
+const CircularProgress: React.FC<CircularProgressProps> = ({
+  percentage,
+  size = 80,
+  color = "#3b82f6",
+}) => {
   const strokeWidth = 6;
-  const radius = (size - strokeWidth * 2) / 2;
-  const circumference = radius * 2 * Math.PI;
 
   // Create smooth progress using many small arcs
   const createProgressArc = () => {
     const totalDegrees = (percentage / 100) * 360;
     const segments = [];
     const segmentCount = Math.max(20, Math.floor(totalDegrees / 5)); // At least 20 segments
-    
-    for (let i = 0; i < segmentCount && i * (360 / segmentCount) < totalDegrees; i++) {
+
+    for (
+      let i = 0;
+      i < segmentCount && i * (360 / segmentCount) < totalDegrees;
+      i++
+    ) {
       const rotation = (360 / segmentCount) * i - 90; // Start from top
-      const segmentWidth = Math.max(2, 360 / segmentCount + 1); // Overlap slightly for smoothness
-      
+
       segments.push(
         <View
           key={i}
@@ -169,11 +171,9 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ percentage, size = 
             height: size,
             borderRadius: size / 2,
             borderWidth: strokeWidth,
-            borderColor: 'transparent',
+            borderColor: "transparent",
             borderTopColor: color,
-            transform: [
-              { rotate: `${rotation}deg` }
-            ],
+            transform: [{ rotate: `${rotation}deg` }],
           }}
         />
       );
@@ -182,7 +182,10 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ percentage, size = 
   };
 
   return (
-    <View style={{ width: size, height: size }} className="justify-center items-center">
+    <View
+      style={{ width: size, height: size }}
+      className="justify-center items-center"
+    >
       {/* Background Circle */}
       <View
         className="absolute"
@@ -191,16 +194,16 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ percentage, size = 
           height: size,
           borderRadius: size / 2,
           borderWidth: strokeWidth,
-          borderColor: '#e5e7eb',
+          borderColor: "#e5e7eb",
         }}
       />
-      
+
       {/* Progress Arc */}
       {createProgressArc()}
 
       {/* Center Text */}
       <View className="absolute justify-center items-center">
-        <Text className="text-base font-bold" style={{ color: '#374151' }}>
+        <Text className="text-base font-bold" style={{ color: "#374151" }}>
           {percentage}%
         </Text>
       </View>
@@ -210,24 +213,10 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ percentage, size = 
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive", 
-        onPress: () => {
-          logout();
-          router.replace("/auth/login");
-        },
-      },
-    ]);
-  };
+  const { user } = useAuth();
 
   const handleProfilePress = () => {
-    router.push("/(student-tabs)/profile");
+    router.push("/(student)/profile");
   };
 
   const getStatusColor = (status: string) => {
@@ -252,16 +241,17 @@ export default function StudentDashboard() {
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       <StatusBar barStyle="dark-content" backgroundColor="#f5f7fa" />
-      
+
       {/* Header */}
       <View className="bg-white px-5 py-4 border-b border-gray-200">
         <View className="flex-row justify-between items-center">
           <View className="flex-1">
             <Text className="text-xl font-semibold text-gray-900">
-              Welcome back, {user?.name?.split(' ')[0] || studentInfo.name.split(' ')[0]}!
+              Welcome back,{" "}
+              {user?.name?.split(" ")[0] || studentInfo.name.split(" ")[0]}!
             </Text>
             <Text className="text-sm text-gray-600">
-              Ready for today's learning journey?
+              Ready for today&apos;s learning journey?
             </Text>
           </View>
           <TouchableOpacity
@@ -308,16 +298,22 @@ export default function StudentDashboard() {
 
         {/* Quick Overview */}
         <View className="bg-white rounded-xl p-5 shadow-md mb-6">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">Quick Overview</Text>
-          
+          <Text className="text-lg font-semibold text-gray-900 mb-4">
+            Quick Overview
+          </Text>
+
           <View className="space-y-3">
             <View className="flex-row justify-between">
               <Text className="text-sm text-gray-600">Student ID</Text>
-              <Text className="text-sm font-medium text-gray-900">{studentInfo.studentId}</Text>
+              <Text className="text-sm font-medium text-gray-900">
+                {studentInfo.studentId}
+              </Text>
             </View>
             <View className="flex-row justify-between">
               <Text className="text-sm text-gray-600">Major</Text>
-              <Text className="text-sm font-medium text-gray-900">Computer Science</Text>
+              <Text className="text-sm font-medium text-gray-900">
+                Computer Science
+              </Text>
             </View>
             <View className="flex-row justify-between">
               <Text className="text-sm text-gray-600">Year</Text>
@@ -325,7 +321,9 @@ export default function StudentDashboard() {
             </View>
             <View className="flex-row justify-between">
               <Text className="text-sm text-gray-600">Semester</Text>
-              <Text className="text-sm font-medium text-gray-900">{studentInfo.semester}</Text>
+              <Text className="text-sm font-medium text-gray-900">
+                {studentInfo.semester}
+              </Text>
             </View>
           </View>
         </View>
@@ -335,11 +333,11 @@ export default function StudentDashboard() {
           <Text className="text-lg font-semibold text-gray-900 mb-4">
             Subject-wise Attendance
           </Text>
-          
+
           <View className="flex-row flex-wrap justify-between">
             {subjectAttendance.slice(0, 4).map((subject, index) => (
               <View key={index} className="w-[48%] items-center mb-4">
-                <CircularProgress 
+                <CircularProgress
                   percentage={subject.percentage}
                   color={getAttendanceColor(subject.percentage)}
                   size={70}
@@ -353,7 +351,7 @@ export default function StudentDashboard() {
               </View>
             ))}
           </View>
-          
+
           <TouchableOpacity className="bg-blue-50 rounded-lg p-3 mt-2">
             <Text className="text-blue-600 text-center font-medium">
               View Detailed Attendance
@@ -364,12 +362,15 @@ export default function StudentDashboard() {
         {/* Today's Timetable */}
         <View className="bg-white rounded-xl p-5 shadow-md mb-6">
           <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Today's Timetable
+            Today’s Timetable
           </Text>
-          
+
           <View className="space-y-3">
             {todaysTimetable.map((class_item, index) => (
-              <View key={index} className="border border-gray-200 rounded-lg p-3">
+              <View
+                key={index}
+                className="border border-gray-200 rounded-lg p-3"
+              >
                 <View className="flex-row justify-between items-start mb-2">
                   <View className="flex-1">
                     <Text className="text-base font-semibold text-gray-900">
@@ -379,13 +380,15 @@ export default function StudentDashboard() {
                       {class_item.chapter}
                     </Text>
                   </View>
-                  <View className={`px-2 py-1 rounded-lg ${getStatusColor(class_item.status)}`}>
+                  <View
+                    className={`px-2 py-1 rounded-lg ${getStatusColor(class_item.status)}`}
+                  >
                     <Text className="text-xs font-medium capitalize">
                       {class_item.status}
                     </Text>
                   </View>
                 </View>
-                
+
                 <View className="flex-row justify-between items-center">
                   <View>
                     <Text className="text-sm font-medium text-gray-900">
@@ -409,10 +412,13 @@ export default function StudentDashboard() {
           <Text className="text-lg font-semibold text-gray-900 mb-4">
             Upcoming Exams
           </Text>
-          
+
           <View className="space-y-3">
             {upcomingExams.map((exam, index) => (
-              <View key={index} className="border-l-4 border-red-400 bg-red-50 rounded-lg p-3">
+              <View
+                key={index}
+                className="border-l-4 border-red-400 bg-red-50 rounded-lg p-3"
+              >
                 <View className="flex-row justify-between items-start">
                   <View className="flex-1">
                     <Text className="text-base font-semibold text-gray-900">
@@ -443,7 +449,7 @@ export default function StudentDashboard() {
           <Text className="text-lg font-semibold text-gray-900 mb-4">
             Academic Statistics
           </Text>
-          
+
           <View className="space-y-4">
             <View>
               <View className="flex-row justify-between mb-2">
@@ -453,25 +459,32 @@ export default function StudentDashboard() {
                 </Text>
               </View>
               <View className="w-full h-2 bg-gray-200 rounded-full">
-                <View 
-                  className="h-2 bg-blue-500 rounded-full" 
-                  style={{ width: `${(studentInfo.attendedLectures / studentInfo.totalLectures) * 100}%` }}
+                <View
+                  className="h-2 bg-blue-500 rounded-full"
+                  style={{
+                    width: `${(studentInfo.attendedLectures / studentInfo.totalLectures) * 100}%`,
+                  }}
                 />
               </View>
             </View>
-            
+
             <View>
               <View className="flex-row justify-between mb-2">
-                <Text className="text-sm text-gray-600">Overall Attendance</Text>
+                <Text className="text-sm text-gray-600">
+                  Overall Attendance
+                </Text>
                 <Text className="text-sm font-medium text-gray-900">
                   {studentInfo.overallAttendance}%
                 </Text>
               </View>
               <View className="w-full h-2 bg-gray-200 rounded-full">
-                <View 
+                <View
                   className={`h-2 rounded-full ${
-                    studentInfo.overallAttendance >= 85 ? 'bg-green-500' :
-                    studentInfo.overallAttendance >= 75 ? 'bg-yellow-500' : 'bg-red-500'
+                    studentInfo.overallAttendance >= 85
+                      ? "bg-green-500"
+                      : studentInfo.overallAttendance >= 75
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
                   }`}
                   style={{ width: `${studentInfo.overallAttendance}%` }}
                 />

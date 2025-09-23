@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "../contexts/AuthContext";
 import "./globals.css";
 
 export default function RootLayout() {
@@ -8,10 +8,9 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="auth" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(student-tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="admin-dashboard" options={{ headerShown: false }} />
-        <Stack.Screen name="attendance" options={{ headerShown: false }} />
+        <Stack.Screen name="(faculty)" options={{ headerShown: false }} />
+        <Stack.Screen name="(student)" options={{ headerShown: false }} />
+        <Stack.Screen name="(admin)" options={{ headerShown: false }} />
       </Stack>
     </AuthProvider>
   );

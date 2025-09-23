@@ -1,6 +1,6 @@
 import { Redirect } from "expo-router";
 import { Text, View } from "react-native";
-import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Index() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -15,17 +15,19 @@ export default function Index() {
   }
 
   // Redirect based on authentication state and user role
-  if (isAuthenticated && user) {
-    // Route to appropriate interface based on user role
-    if (user.role === "student") {
-      return <Redirect href="/(student-tabs)/" />;
-    } else if (user.role === "admin") {
-      return <Redirect href="/admin-dashboard" />;
-    } else {
-      // Teachers, admins, and other roles go to regular tabs
-      return <Redirect href="/(tabs)" />;
-    }
-  } else {
+  if (!isAuthenticated || !user) {
     return <Redirect href="/auth/login" />;
   }
+
+  if (user.role === "student") {
+    return <Redirect href="/(student)" />;
+  }
+
+  if (user.role === "admin") {
+    // Land admins directly on the Admin tab inside the teacher/admin tabs group
+    return <Redirect href="/(admin)/dashboard" />;
+  }
+
+  // Teachers (and other non-student, non-admin roles) go to the default tabs
+  return <Redirect href="/(faculty)" />;
 }
