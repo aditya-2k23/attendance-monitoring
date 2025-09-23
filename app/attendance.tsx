@@ -66,7 +66,7 @@ export default function AttendancePage() {
     // You can find it by running `expo start` and looking at the QR code URL
     // Or use 'http://192.168.x.x:3001' (replace with your actual IP)
     // const socketConnection = io("http://10.0.2.2:3001"); // Android emulator
-    const socketConnection = io("http://192.168.31.167:3001"); // Use your actual IP for physical device
+    const socketConnection = io("http://192.168.31.132:3001"); // Use your actual IP for physical device
 
     socketConnection.on("connect", () => {
       console.log("Connected to server");
