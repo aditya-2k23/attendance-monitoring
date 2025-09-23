@@ -1,87 +1,196 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import { supabase } from "@/utils/supabase";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 export type UserRole = "student" | "teacher" | "admin";
 
 export interface User {
   id: string;
-  userId: string;
+  email: string;
   role: UserRole;
   name: string;
+  userId?: string; // roll_no for students, teacher_code for teachers
+  department?: string;
+  photoUrl?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (userId: string, password: string, role: UserRole) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = async (
-    userId: string,
-    password: string,
-    role: UserRole
-  ): Promise<boolean> => {
-    setIsLoading(true);
-
-    try {
-      // Simulate API call - replace with actual authentication logic
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock authentication logic - replace with real authentication
-      const mockUsers = {
-        teacher123: {
-          password: "password123",
-          name: "Dr. John Smith",
-          role: "teacher" as UserRole,
-        },
-        student456: {
-          password: "password456",
-          name: "Alice Johnson",
-          role: "student" as UserRole,
-        },
-        admin789: {
-          password: "admin123",
-          name: "Admin User",
-          role: "admin" as UserRole,
-        },
-      };
-
-      const mockUser = mockUsers[userId as keyof typeof mockUsers];
-
-      if (
-        mockUser &&
-        mockUser.password === password &&
-        mockUser.role === role
-      ) {
-        const authenticatedUser: User = {
-          id: Date.now().toString(),
-          userId,
-          role,
-          name: mockUser.name,
-        };
-
-        setUser(authenticatedUser);
+  // Check for existing session on app start
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.user) {
+          await loadUserProfile(session.user);
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      } finally {
         setIsLoading(false);
-        return true;
+      }
+    };
+
+    checkSession();
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        await loadUserProfile(session.user);
+      } else if (event === "SIGNED_OUT") {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadUserProfile = async (authUser: SupabaseUser) => {
+    try {
+      // First check if it's an admin by checking user metadata
+      const userMetadata = authUser.user_metadata;
+      if (userMetadata?.role === "admin") {
+        setUser({
+          id: authUser.id,
+          email: authUser.email!,
+          role: "admin",
+          name: userMetadata.full_name || "Admin User",
+        });
+        return;
+      }
+
+      // Try to find in students table first
+      const { data: studentData, error: studentError } = await supabase
+        .from("students")
+        .select("*")
+        .eq("auth_user_id", authUser.id)
+        .single();
+
+      if (studentData && !studentError) {
+        setUser({
+          id: authUser.id,
+          email: authUser.email!,
+          role: "student",
+          name: studentData.full_name,
+          userId: studentData.id?.toString(), // Use database ID as fallback
+          department: studentData.department,
+          photoUrl: studentData.photo_url,
+        });
+        return;
+      }
+
+      // Try to find in teachers table
+      const { data: teacherData, error: teacherError } = await supabase
+        .from("teachers")
+        .select("*")
+        .eq("auth_user_id", authUser.id)
+        .single();
+
+      if (teacherData && !teacherError) {
+        setUser({
+          id: authUser.id,
+          email: authUser.email!,
+          role: "teacher",
+          name: teacherData.full_name,
+          userId: teacherData.teacher_code,
+          department: teacherData.department,
+          photoUrl: teacherData.photo_url,
+        });
+        return;
+      }
+
+      // If not found in either table, this might be a new user or admin
+      // Check if email contains admin keywords as fallback
+      if (authUser.email?.includes("admin") || userMetadata?.role) {
+        setUser({
+          id: authUser.id,
+          email: authUser.email!,
+          role: userMetadata?.role || "admin",
+          name: userMetadata?.full_name || authUser.email!,
+        });
       } else {
+        console.warn("User profile not found in students or teachers table");
+        setUser({
+          id: authUser.id,
+          email: authUser.email!,
+          role: "student", // default role
+          name: userMetadata?.full_name || authUser.email!,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading user profile:", error);
+    }
+  };
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error("Login error:", error);
         setIsLoading(false);
         return false;
       }
-    } catch {
+
+      if (data.user) {
+        await loadUserProfile(data.user);
+        setIsLoading(false);
+        return true;
+      }
+
+      setIsLoading(false);
+      return false;
+    } catch (error) {
+      console.error("Login error:", error);
       setIsLoading(false);
       return false;
     }
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const refreshUser = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session?.user) {
+      await loadUserProfile(session.user);
+    }
   };
 
   const value: AuthContextType = {
@@ -90,6 +199,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     isAuthenticated: !!user,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

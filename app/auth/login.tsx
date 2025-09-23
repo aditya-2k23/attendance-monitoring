@@ -1,5 +1,4 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,14 +12,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth, UserRole } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function LoginScreen() {
-  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("student");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ userId?: string; password?: string }>(
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {}
   );
 
@@ -28,10 +26,12 @@ export default function LoginScreen() {
   const router = useRouter();
 
   const validateForm = () => {
-    const newErrors: { userId?: string; password?: string } = {};
+    const newErrors: { email?: string; password?: string } = {};
 
-    if (!userId.trim()) {
-      newErrors.userId = "User ID is required";
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!password.trim()) {
@@ -47,7 +47,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     if (!validateForm()) return;
 
-    const success = await login(userId.trim(), password, role);
+    const success = await login(email.trim(), password);
 
     if (success) {
       // Always redirect to home - the main index will handle role-based routing
@@ -55,28 +55,9 @@ export default function LoginScreen() {
     } else {
       Alert.alert(
         "Login Failed",
-        "Invalid credentials. Please check your User ID, password, and selected role.",
+        "Invalid credentials. Please check your email and password.",
         [{ text: "OK" }]
       );
-    }
-  };
-
-  const getRoleIcon = (selectedRole: UserRole) => {
-    switch (selectedRole) {
-      case "student":
-        return <MaterialIcons name="school" size={20} color="#3b82f6" />;
-      case "teacher":
-        return <MaterialIcons name="person" size={20} color="#10b981" />;
-      case "admin":
-        return (
-          <MaterialIcons
-            name="admin-panel-settings"
-            size={20}
-            color="#f59e0b"
-          />
-        );
-      default:
-        return <MaterialIcons name="person" size={20} color="#6b7280" />;
     }
   };
 
@@ -111,57 +92,35 @@ export default function LoginScreen() {
 
         {/* Login Form */}
         <View className="space-y-6">
-          {/* Role Selection */}
+          {/* Email Input */}
           <View>
             <Text className="text-sm font-semibold text-gray-700 mb-3">
-              Select Role
-            </Text>
-            <View className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <View className="flex-row items-center px-4 py-2">
-                {getRoleIcon(role)}
-                <View className="flex-1 ml-3">
-                  <Picker
-                    selectedValue={role}
-                    onValueChange={(itemValue: UserRole) => setRole(itemValue)}
-                    style={{ height: 50 }}
-                  >
-                    <Picker.Item label="Student Login" value="student" />
-                    <Picker.Item label="Teacher Login" value="teacher" />
-                    <Picker.Item label="Admin Login" value="admin" />
-                  </Picker>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* User ID Input */}
-          <View>
-            <Text className="text-sm font-semibold text-gray-700 mb-3">
-              User ID
+              Email Address
             </Text>
             <View
               className={`bg-white border rounded-xl px-4 py-4 flex-row items-center ${
-                errors.userId ? "border-red-300" : "border-gray-200"
+                errors.email ? "border-red-300" : "border-gray-200"
               }`}
             >
               <MaterialIcons name="person-outline" size={20} color="#6b7280" />
               <TextInput
                 className="flex-1 ml-3 text-base text-gray-900"
-                placeholder="Enter your User ID"
+                placeholder="Enter your email address"
                 placeholderTextColor="#9ca3af"
-                value={userId}
+                value={email}
                 onChangeText={(text) => {
-                  setUserId(text);
-                  if (errors.userId)
-                    setErrors((prev) => ({ ...prev, userId: undefined }));
+                  setEmail(text);
+                  if (errors.email)
+                    setErrors((prev) => ({ ...prev, email: undefined }));
                 }}
                 autoCapitalize="none"
                 autoCorrect={false}
+                keyboardType="email-address"
               />
             </View>
-            {errors.userId && (
+            {errors.email && (
               <Text className="text-red-500 text-sm mt-1 ml-1">
-                {errors.userId}
+                {errors.email}
               </Text>
             )}
           </View>
@@ -227,22 +186,6 @@ export default function LoginScreen() {
               </Text>
             )}
           </TouchableOpacity>
-
-          {/* Demo Credentials */}
-          <View className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-            <Text className="text-sm font-semibold text-yellow-800 mb-2">
-              Demo Credentials:
-            </Text>
-            <Text className="text-xs text-yellow-700">
-              Teacher: teacher123 / password123
-            </Text>
-            <Text className="text-xs text-yellow-700">
-              Student: student456 / password456
-            </Text>
-            <Text className="text-xs text-yellow-700">
-              Admin: admin789 / admin123
-            </Text>
-          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
