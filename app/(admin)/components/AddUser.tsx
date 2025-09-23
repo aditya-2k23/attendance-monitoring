@@ -289,285 +289,273 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <View className="flex-1 bg-black/60 justify-center items-center px-3">
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: "center",
             alignItems: "center",
+            paddingVertical: 16,
           }}
+          showsVerticalScrollIndicator={false}
         >
-          <View
-            style={{
-              backgroundColor: "white",
-              borderRadius: 12,
-              padding: 18,
-              width: "92%",
-              maxWidth: 480,
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 8 }}>
-              Add New User
-            </Text>
+          <View className="bg-white rounded-2xl p-5 w-full min-w-[350px] shadow-lg">
+            {/* Header */}
+            <View className="items-center mb-4">
+              <View className="w-12 h-12 rounded-full bg-blue-50 justify-center items-center">
+                <Text className="text-xl">👥</Text>
+              </View>
+              <Text className="text-xl font-bold text-gray-800">
+                Add New User
+              </Text>
+              <Text className="text-sm text-gray-500 text-center">
+                Create a new{" "}
+                <Text className="font-semibold">{newUser.role}</Text> account
+              </Text>
+            </View>
 
-            {/* Photo */}
-            <View style={{ alignItems: "center", marginBottom: 12 }}>
-              {newUser.photoUri ? (
-                <Image
-                  source={{ uri: newUser.photoUri }}
-                  style={{
-                    width: 96,
-                    height: 96,
-                    borderRadius: 48,
-                    marginBottom: 8,
-                  }}
-                />
-              ) : (
-                <View
-                  style={{
-                    width: 96,
-                    height: 96,
-                    borderRadius: 48,
-                    backgroundColor: "#E5E7EB",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginBottom: 8,
-                  }}
+            {/* Role Selection */}
+            <View className="mb-4">
+              <Text className="text-base font-semibold text-gray-700 mb-2.5">
+                User Type
+              </Text>
+              <View className="flex-row gap-2">
+                <TouchableOpacity
+                  onPress={() => setNewUser({ ...newUser, role: "teacher" })}
+                  className={`flex-1 p-3 rounded-xl border-2 items-center ${
+                    newUser.role === "teacher"
+                      ? "bg-blue-600 border-blue-600"
+                      : "bg-gray-50 border-gray-200"
+                  }`}
                 >
-                  <Text style={{ fontSize: 28 }}>📷</Text>
+                  <Text className="text-lg mb-0.5">👨‍🏫</Text>
+                  <Text
+                    className={`font-semibold text-sm ${
+                      newUser.role === "teacher"
+                        ? "text-white"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    Teacher
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setNewUser({ ...newUser, role: "student" })}
+                  className={`flex-1 p-3 rounded-xl border-2 items-center ${
+                    newUser.role === "student"
+                      ? "bg-blue-600 border-blue-600"
+                      : "bg-gray-50 border-gray-200"
+                  }`}
+                >
+                  <Text className="text-lg mb-0.5">🎓</Text>
+                  <Text
+                    className={`font-semibold text-sm ${
+                      newUser.role === "student"
+                        ? "text-white"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    Student
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Photo Section */}
+            <View className="items-center mb-4.5">
+              {newUser.photoUri ? (
+                <View className="items-center">
+                  <Image
+                    source={{ uri: newUser.photoUri }}
+                    className="w-20 h-20 rounded-full mb-2 border-2 border-gray-200"
+                  />
+                  <TouchableOpacity
+                    onPress={showPhotoOptions}
+                    className="px-3 py-1.5 bg-gray-100 rounded-2xl border border-gray-300"
+                  >
+                    <Text className="text-gray-700 font-medium text-xs">
+                      Change Photo
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={showPhotoOptions}
+                  className="w-20 h-20 rounded-full bg-gray-50 border-2 border-gray-200 border-dashed justify-center items-center mb-2"
+                >
+                  <Text className="text-2xl">📷</Text>
+                  <Text className="text-xs text-gray-500 text-center">
+                    Add Photo
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Form Fields */}
+            <View className="mb-6">
+              <Text className="text-base font-semibold text-gray-700 mb-2">
+                Basic Information
+              </Text>
+
+              <View className="mb-2.5">
+                <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                  Full Name *
+                </Text>
+                <TextInput
+                  placeholder="Enter full name"
+                  value={newUser.name}
+                  onChangeText={(t) => setNewUser({ ...newUser, name: t })}
+                  className="border border-gray-300 p-3 rounded-xl text-sm bg-gray-50"
+                />
+              </View>
+
+              <View className="mb-2.5">
+                <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                  Email Address *
+                </Text>
+                <TextInput
+                  placeholder="Enter email address"
+                  value={newUser.email}
+                  onChangeText={(t) => setNewUser({ ...newUser, email: t })}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  className="border border-gray-300 p-3.5 rounded-xl text-base bg-gray-50"
+                />
+              </View>
+
+              <View className="mb-4">
+                <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                  Phone Number
+                </Text>
+                <TextInput
+                  placeholder="Enter phone number"
+                  value={newUser.phone}
+                  onChangeText={(t) => setNewUser({ ...newUser, phone: t })}
+                  keyboardType="phone-pad"
+                  className="border border-gray-300 p-3.5 rounded-xl text-base bg-gray-50"
+                />
+              </View>
+
+              <View className="mb-4">
+                <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                  Department *
+                </Text>
+                <TextInput
+                  placeholder="Enter department"
+                  value={newUser.department}
+                  onChangeText={(t) =>
+                    setNewUser({ ...newUser, department: t })
+                  }
+                  className="border border-gray-300 p-3.5 rounded-xl text-base bg-gray-50"
+                />
+              </View>
+
+              {newUser.role === "teacher" && (
+                <View className="mb-3">
+                  <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                    Teacher Code *
+                  </Text>
+                  <TextInput
+                    placeholder="Enter teacher code"
+                    value={newUser.userId}
+                    onChangeText={(t) => setNewUser({ ...newUser, userId: t })}
+                    className="border border-gray-300 p-3.5 rounded-xl text-base bg-gray-50"
+                  />
                 </View>
               )}
-              <TouchableOpacity
-                onPress={showPhotoOptions}
-                style={{
-                  padding: 8,
-                  backgroundColor: "#EFF6FF",
-                  borderRadius: 8,
-                }}
-              >
-                <Text style={{ color: "#1D4ED8", fontWeight: "600" }}>
-                  {newUser.photoUri ? "Change Photo" : "Add Photo"}
-                </Text>
-              </TouchableOpacity>
+
+              {newUser.role === "student" && (
+                <View className="mb-4">
+                  <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                    Enrollment Year
+                  </Text>
+                  <TextInput
+                    placeholder="Enter enrollment year"
+                    value={newUser.enrollmentYear.toString()}
+                    onChangeText={(t) =>
+                      setNewUser({
+                        ...newUser,
+                        enrollmentYear: parseInt(t) || new Date().getFullYear(),
+                      })
+                    }
+                    keyboardType="numeric"
+                    className="border border-gray-300 p-3.5 rounded-xl text-base bg-gray-50"
+                  />
+                </View>
+              )}
             </View>
 
-            <TextInput
-              placeholder="Full Name *"
-              value={newUser.name}
-              onChangeText={(t) => setNewUser({ ...newUser, name: t })}
-              style={{
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}
-            />
-            <TextInput
-              placeholder="Email Address *"
-              value={newUser.email}
-              onChangeText={(t) => setNewUser({ ...newUser, email: t })}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              style={{
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}
-            />
-            <TextInput
-              placeholder="Phone Number"
-              value={newUser.phone}
-              onChangeText={(t) => setNewUser({ ...newUser, phone: t })}
-              keyboardType="phone-pad"
-              style={{
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}
-            />
-            {newUser.role === "teacher" && (
-              <TextInput
-                placeholder="Teacher Code *"
-                value={newUser.userId}
-                onChangeText={(t) => setNewUser({ ...newUser, userId: t })}
-                style={{
-                  borderWidth: 1,
-                  borderColor: "#E5E7EB",
-                  padding: 10,
-                  borderRadius: 8,
-                  marginBottom: 8,
-                }}
-              />
-            )}
-            {newUser.role === "student" && (
-              <TextInput
-                placeholder="Enrollment Year"
-                value={newUser.enrollmentYear.toString()}
-                onChangeText={(t) =>
-                  setNewUser({
-                    ...newUser,
-                    enrollmentYear: parseInt(t) || new Date().getFullYear(),
-                  })
-                }
-                keyboardType="numeric"
-                style={{
-                  borderWidth: 1,
-                  borderColor: "#E5E7EB",
-                  padding: 10,
-                  borderRadius: 8,
-                  marginBottom: 8,
-                }}
-              />
-            )}
-            <TextInput
-              placeholder="Department *"
-              value={newUser.department}
-              onChangeText={(t) => setNewUser({ ...newUser, department: t })}
-              style={{
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}
-            />
+            {/* Security Section */}
+            <View className="mb-6">
+              <Text className="text-base font-semibold text-gray-700 mb-3">
+                Account Security
+              </Text>
 
-            <TextInput
-              placeholder="Temporary Password (for new user) *"
-              value={newUser.tempPassword}
-              onChangeText={(t) => setNewUser({ ...newUser, tempPassword: t })}
-              secureTextEntry
-              style={{
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}
-            />
-
-            <TextInput
-              placeholder="Your admin password (confirm) *"
-              value={newUser.adminPassword}
-              onChangeText={(t) => setNewUser({ ...newUser, adminPassword: t })}
-              secureTextEntry
-              style={{
-                borderWidth: 1,
-                borderColor: "#E5E7EB",
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}
-            />
-
-            <View style={{ flexDirection: "row", marginBottom: 12 }}>
-              <TouchableOpacity
-                onPress={() => setNewUser({ ...newUser, role: "teacher" })}
-                style={{
-                  flex: 1,
-                  padding: 10,
-                  marginRight: 6,
-                  backgroundColor:
-                    newUser.role === "teacher" ? "#2563EB" : "#E5E7EB",
-                  borderRadius: 8,
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: newUser.role === "teacher" ? "white" : "#374151",
-                    fontWeight: "600",
-                  }}
-                >
-                  Teacher
+              <View className="mb-3">
+                <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                  Temporary Password (for new user) *
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setNewUser({ ...newUser, role: "student" })}
-                style={{
-                  flex: 1,
-                  padding: 10,
-                  marginLeft: 6,
-                  backgroundColor:
-                    newUser.role === "student" ? "#2563EB" : "#E5E7EB",
-                  borderRadius: 8,
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: newUser.role === "student" ? "white" : "#374151",
-                    fontWeight: "600",
-                  }}
-                >
-                  Student
+                <TextInput
+                  placeholder="Set temporary password"
+                  value={newUser.tempPassword}
+                  onChangeText={(t) =>
+                    setNewUser({ ...newUser, tempPassword: t })
+                  }
+                  secureTextEntry
+                  className="border border-gray-300 p-3 rounded-xl text-sm bg-gray-50"
+                />
+              </View>
+
+              <View>
+                <Text className="text-sm font-medium text-gray-700 mb-1.5">
+                  Confirm Your Admin Password *
                 </Text>
-              </TouchableOpacity>
+                <TextInput
+                  placeholder="Enter your admin password"
+                  value={newUser.adminPassword}
+                  onChangeText={(t) =>
+                    setNewUser({ ...newUser, adminPassword: t })
+                  }
+                  secureTextEntry
+                  className="border border-gray-300 p-3 rounded-xl text-sm bg-gray-50"
+                />
+                <Text className="text-xs text-gray-500 mt-1">
+                  Required to verify your identity
+                </Text>
+              </View>
             </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 8,
-              }}
-            >
+            {/* Action Buttons */}
+            <View className="flex-row gap-2.5">
               <TouchableOpacity
                 onPress={() => {
                   resetForm();
                   onClose();
                 }}
-                style={{
-                  flex: 1,
-                  backgroundColor: "#E5E7EB",
-                  padding: 12,
-                  borderRadius: 8,
-                  marginRight: 8,
-                }}
+                className="flex-1 bg-gray-100 p-3.5 rounded-xl border border-gray-300"
               >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: "#374151",
-                    fontWeight: "600",
-                  }}
-                >
+                <Text className="text-center text-gray-700 font-semibold text-sm">
                   Cancel
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleAddUser}
-                style={{
-                  flex: 1,
-                  backgroundColor: "#2563EB",
-                  padding: 12,
-                  borderRadius: 8,
-                }}
+                disabled={loading}
+                className={`flex-1 p-3.5 rounded-xl shadow-md ${
+                  loading ? "bg-gray-400" : "bg-blue-600"
+                }`}
               >
                 {loading ? (
-                  <ActivityIndicator color="#fff" />
+                  <View className="flex-row justify-center items-center">
+                    <ActivityIndicator color="#fff" size="small" />
+                    <Text className="ml-1.5 text-white font-semibold text-sm">
+                      Creating...
+                    </Text>
+                  </View>
                 ) : (
-                  <Text
-                    style={{
-                      textAlign: "center",
-                      color: "white",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Add User
+                  <Text className="text-center text-white font-semibold text-sm">
+                    Create User
                   </Text>
                 )}
               </TouchableOpacity>
