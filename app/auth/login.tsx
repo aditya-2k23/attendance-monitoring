@@ -94,18 +94,18 @@ export default function LoginScreen() {
         <View className="space-y-6">
           {/* Email Input */}
           <View>
-            <Text className="text-sm font-semibold text-gray-700 mb-3">
-              Email Address
+            <Text className="text-sm font-semibold text-gray-700 mb-2">
+              User Id
             </Text>
             <View
-              className={`bg-white border rounded-xl px-4 py-4 flex-row items-center ${
+              className={`bg-white border rounded-xl px-3 py-2 flex-row items-center ${
                 errors.email ? "border-red-300" : "border-gray-200"
               }`}
             >
               <MaterialIcons name="person-outline" size={20} color="#6b7280" />
               <TextInput
                 className="flex-1 ml-3 text-base text-gray-900"
-                placeholder="Enter your email address"
+                placeholder="Enter your user id"
                 placeholderTextColor="#9ca3af"
                 value={email}
                 onChangeText={(text) => {
@@ -127,11 +127,11 @@ export default function LoginScreen() {
 
           {/* Password Input */}
           <View>
-            <Text className="text-sm font-semibold text-gray-700 mb-3">
+            <Text className="text-sm font-semibold text-gray-700 mt-1 mb-2">
               Password
             </Text>
             <View
-              className={`bg-white border rounded-xl px-4 py-4 flex-row items-center ${
+              className={`bg-white border rounded-xl px-3 py-2 flex-row items-center ${
                 errors.password ? "border-red-300" : "border-gray-200"
               }`}
             >
