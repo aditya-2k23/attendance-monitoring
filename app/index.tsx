@@ -17,7 +17,7 @@ export default function Index() {
   // Redirect based on authentication state and user role
   if (isAuthenticated && user) {
     // Route to appropriate interface based on user role
-    if (user.role === 'student') {
+    if (user.role === "student") {
       return <Redirect href="/(student-tabs)" />;
     } else {
       // Teachers, admins, and other roles go to regular tabs
