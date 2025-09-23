@@ -1,60 +1,29 @@
-import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/utils/supabase";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Alert,
-  Image,
-  Modal,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  userId: string; // student/teacher ID
-  role: "teacher" | "student";
-  department?: string;
-  courses?: string[];
-  photoUri?: string; // photo URI
-  status: "active" | "inactive";
-}
-
-interface AttendanceStats {
-  department: string;
-  totalStudents: number;
-  presentToday: number;
-  averageRate: number;
-  atRiskCount: number;
-}
-
-interface FacultyPerformance {
-  teacherId: number;
-  name: string;
-  scheduledClasses: number;
-  conductedClasses: number;
-  missedClasses: number;
-  performanceRate: number;
-}
+import AddUser from "./components/AddUser";
+import Faculty from "./components/Faculty";
+import Overview from "./components/Overview";
+import Reports from "./components/Reports";
+import Users from "./components/Users";
+import { AttendanceStats, FacultyPerformance, User } from "./types";
 
 export default function AdminDashboard() {
-  const router = useRouter();
   const [selectedSection, setSelectedSection] = useState<string>("overview");
   const [showUserModal, setShowUserModal] = useState(false);
-  const [newUser, setNewUser] = useState({
-    name: "",
-    email: "",
-    userId: "",
-    role: "student" as "teacher" | "student",
-    department: "",
-    photoUri: "",
-  });
+  const [users, setUsers] = useState<User[]>([]);
+  const { logout } = useAuth();
 
   // Mock data
   const attendanceStats: AttendanceStats[] = [
@@ -130,40 +99,76 @@ export default function AdminDashboard() {
     },
   ];
 
-  const users: User[] = [
-    {
-      id: 1,
-      name: "Dr. Sarah Wilson",
-      email: "sarah.wilson@college.edu",
-      userId: "TCH001",
-      role: "teacher",
-      department: "Computer Science",
-      courses: ["Data Structures", "Algorithms"],
-      photoUri: "https://via.placeholder.com/150x150/4CAF50/FFFFFF?text=SW",
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "John Doe",
-      email: "john.doe@student.college.edu",
-      userId: "STU2023001",
-      role: "student",
-      department: "Computer Science",
-      photoUri: "https://via.placeholder.com/150x150/2196F3/FFFFFF?text=JD",
-      status: "active",
-    },
-    {
-      id: 3,
-      name: "Prof. Emily Davis",
-      email: "emily.davis@college.edu",
-      userId: "TCH002",
-      role: "teacher",
-      department: "Mathematics",
-      courses: ["Calculus I", "Linear Algebra"],
-      photoUri: "https://via.placeholder.com/150x150/FF9800/FFFFFF?text=ED",
-      status: "active",
-    },
-  ];
+  // Initialize users by fetching from database
+  useEffect(() => {
+    // Load users from database on component mount
+    refreshUsers();
+  }, []);
+
+  // Function to refresh users list (fetch from database)
+  const refreshUsers = async () => {
+    try {
+      // Fetch students and teachers from the database
+      const [studentsResponse, teachersResponse] = await Promise.all([
+        supabase.from("students").select("*"),
+        supabase.from("teachers").select("*"),
+      ]);
+
+      if (studentsResponse.error) {
+        console.error("Error fetching students:", studentsResponse.error);
+        return;
+      }
+
+      if (teachersResponse.error) {
+        console.error("Error fetching teachers:", teachersResponse.error);
+        return;
+      }
+
+      // Transform database records to User interface
+      const students: User[] = (studentsResponse.data || []).map(
+        (student: any) => ({
+          id: student.id,
+          name: student.full_name,
+          email: student.email,
+          userId: student.id?.toString(), // Use database ID since there's no roll_no
+          role: "student" as const,
+          department: student.department,
+          photoUri:
+            student.photo_url ||
+            "https://via.placeholder.com/150x150/2196F3/FFFFFF?text=" +
+              student.full_name.charAt(0),
+          status: student.is_active
+            ? ("active" as const)
+            : ("inactive" as const),
+        })
+      );
+
+      const teachers: User[] = (teachersResponse.data || []).map(
+        (teacher: any) => ({
+          id: teacher.id,
+          name: teacher.full_name,
+          email: teacher.email,
+          userId: teacher.teacher_code,
+          role: "teacher" as const,
+          department: teacher.department,
+          courses: [], // You might want to fetch this from a separate table
+          photoUri:
+            teacher.photo_url ||
+            "https://via.placeholder.com/150x150/4CAF50/FFFFFF?text=" +
+              teacher.full_name.charAt(0),
+          status: teacher.is_active
+            ? ("active" as const)
+            : ("inactive" as const),
+        })
+      );
+
+      // Combine and set users
+      setUsers([...students, ...teachers]);
+    } catch (error) {
+      console.error("Error refreshing users:", error);
+      Alert.alert("Error", "Failed to refresh users list. Please try again.");
+    }
+  };
 
   const totalStudents = attendanceStats.reduce(
     (sum, stat) => sum + stat.totalStudents,
@@ -181,90 +186,6 @@ export default function AdminDashboard() {
     (totalPresent / totalStudents) * 100
   );
 
-  const handleAddUser = () => {
-    if (
-      !newUser.name ||
-      !newUser.email ||
-      !newUser.userId ||
-      !newUser.department
-    ) {
-      Alert.alert("Error", "Please fill all required fields");
-      return;
-    }
-    Alert.alert(
-      "Success",
-      `${newUser.role} ${newUser.name} (ID: ${newUser.userId}) has been added successfully`
-    );
-    setNewUser({
-      name: "",
-      email: "",
-      userId: "",
-      role: "student",
-      department: "",
-      photoUri: "",
-    });
-    setShowUserModal(false);
-  };
-
-  const handleTakePhoto = async () => {
-    // Request camera permissions
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert(
-        "Permission Required",
-        "Permission to access camera is required to take photos."
-      );
-      return;
-    }
-
-    // Launch camera
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      setNewUser({ ...newUser, photoUri: result.assets[0].uri });
-    }
-  };
-
-  const handleSelectPhoto = async () => {
-    // Request media library permissions
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert(
-        "Permission Required",
-        "Permission to access photo library is required."
-      );
-      return;
-    }
-
-    // Launch image picker
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      setNewUser({ ...newUser, photoUri: result.assets[0].uri });
-    }
-  };
-
-  const showPhotoOptions = () => {
-    Alert.alert("Add Photo", "Choose how you want to add a photo", [
-      { text: "Take Photo", onPress: handleTakePhoto },
-      { text: "Choose from Gallery", onPress: handleSelectPhoto },
-      { text: "Cancel", style: "cancel" },
-    ]);
-  };
-
   const handleExportReport = (reportType: string) => {
     Alert.alert(
       "Export Report",
@@ -272,279 +193,36 @@ export default function AdminDashboard() {
     );
   };
 
-  const renderOverview = () => (
-    <View>
-      {/* Global Statistics */}
-      <View className="mb-6">
-        <Text className="text-xl font-semibold text-gray-900 mb-4">
-          Global Statistics
-        </Text>
-        <View className="flex-row flex-wrap justify-between">
-          <View className="w-[48%] bg-white rounded-xl p-4 mb-4 shadow-md">
-            <Text className="text-2xl font-bold text-blue-600">
-              {totalStudents.toLocaleString()}
-            </Text>
-            <Text className="text-sm text-gray-600">Total Students</Text>
-          </View>
-          <View className="w-[48%] bg-white rounded-xl p-4 mb-4 shadow-md">
-            <Text className="text-2xl font-bold text-green-600">
-              {overallAttendanceRate}%
-            </Text>
-            <Text className="text-sm text-gray-600">Overall Attendance</Text>
-          </View>
-          <View className="w-[48%] bg-white rounded-xl p-4 mb-4 shadow-md">
-            <Text className="text-2xl font-bold text-orange-600">
-              {totalAtRisk}
-            </Text>
-            <Text className="text-sm text-gray-600">At-Risk Students</Text>
-          </View>
-          <View className="w-[48%] bg-white rounded-xl p-4 mb-4 shadow-md">
-            <Text className="text-2xl font-bold text-purple-600">
-              {facultyPerformance.length}
-            </Text>
-            <Text className="text-sm text-gray-600">Active Faculty</Text>
-          </View>
-        </View>
-      </View>
+  const handleLogout = () => {
+    // If web platform, use confirm dialog
+    if (Platform.OS === "web") {
+      if (confirm("Are you sure you want to logout?")) {
+        logout();
+        router.replace("/auth/login");
+      }
+      return;
+    }
 
-      {/* Department Attendance */}
-      <View className="mb-6">
-        <Text className="text-xl font-semibold text-gray-900 mb-4">
-          Department-wise Attendance
-        </Text>
-        <View className="bg-white rounded-xl shadow-md">
-          {attendanceStats.map((dept, index) => (
-            <View
-              key={dept.department}
-              className={`p-4 ${index < attendanceStats.length - 1 ? "border-b border-gray-200" : ""}`}
-            >
-              <View className="flex-row justify-between items-center mb-2">
-                <Text className="text-base font-semibold text-gray-900">
-                  {dept.department}
-                </Text>
-                <Text
-                  className={`text-base font-bold ${dept.averageRate >= 90 ? "text-green-600" : dept.averageRate >= 80 ? "text-orange-600" : "text-red-600"}`}
-                >
-                  {dept.averageRate}%
-                </Text>
-              </View>
-              <View className="flex-row justify-between">
-                <Text className="text-sm text-gray-600">
-                  {dept.presentToday}/{dept.totalStudents} present today
-                </Text>
-                <Text className="text-sm text-red-600">
-                  {dept.atRiskCount} at-risk
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderUserManagement = () => (
-    <View>
-      <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-xl font-semibold text-gray-900">
-          User Management
-        </Text>
-        <TouchableOpacity
-          className="bg-blue-600 px-4 py-2 rounded-lg"
-          onPress={() => setShowUserModal(true)}
-        >
-          <Text className="text-white font-semibold">Add User</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View className="bg-white rounded-xl shadow-md">
-        {users.map((user, index) => (
-          <View
-            key={user.id}
-            className={`p-4 ${index < users.length - 1 ? "border-b border-gray-200" : ""}`}
-          >
-            <View className="flex-row justify-between items-start">
-              {/* User Photo */}
-              <View className="mr-3">
-                {user.photoUri ? (
-                  <Image
-                    source={{ uri: user.photoUri }}
-                    className="w-12 h-12 rounded-full bg-gray-200"
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View className="w-12 h-12 rounded-full bg-gray-300 justify-center items-center">
-                    <Text className="text-lg font-semibold text-gray-600">
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .substring(0, 2)}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              <View className="flex-1">
-                <View className="flex-row items-center mb-1">
-                  <Text className="text-base font-semibold text-gray-900 mr-2">
-                    {user.name}
-                  </Text>
-                  <View
-                    className={`px-2 py-1 rounded-full ${user.role === "teacher" ? "bg-blue-100" : "bg-green-100"}`}
-                  >
-                    <Text
-                      className={`text-xs font-semibold ${user.role === "teacher" ? "text-blue-700" : "text-green-700"}`}
-                    >
-                      {user.role.toUpperCase()}
-                    </Text>
-                  </View>
-                </View>
-                <Text className="text-sm text-gray-600 mb-1">{user.email}</Text>
-                <Text className="text-sm text-gray-600 mb-1">
-                  ID: {user.userId}
-                </Text>
-                <Text className="text-sm text-gray-600">{user.department}</Text>
-                {user.courses && (
-                  <Text className="text-xs text-gray-500 mt-1">
-                    Courses: {user.courses.join(", ")}
-                  </Text>
-                )}
-              </View>
-              <View className="flex-row space-x-2">
-                <TouchableOpacity className="bg-gray-100 px-3 py-1 rounded-lg">
-                  <Text className="text-xs text-gray-700">Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity className="bg-red-100 px-3 py-1 rounded-lg">
-                  <Text className="text-xs text-red-700">Remove</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-
-  const renderReports = () => (
-    <View>
-      <Text className="text-xl font-semibold text-gray-900 mb-4">
-        Reports & Analytics
-      </Text>
-
-      {/* Export Options */}
-      <View className="bg-white rounded-xl p-4 shadow-md mb-6">
-        <Text className="text-lg font-semibold text-gray-900 mb-4">
-          Export Reports
-        </Text>
-        <View className="space-y-3">
-          <TouchableOpacity
-            className="bg-green-600 p-3 rounded-lg"
-            onPress={() => handleExportReport("Monthly Attendance CSV")}
-          >
-            <Text className="text-white font-semibold text-center">
-              Export Monthly Attendance (CSV)
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-blue-600 p-3 rounded-lg"
-            onPress={() => handleExportReport("Semester Report PDF")}
-          >
-            <Text className="text-white font-semibold text-center">
-              Export Semester Report (PDF)
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* At-Risk Students */}
-      <View className="bg-white rounded-xl shadow-md">
-        <View className="p-4 border-b border-gray-200">
-          <Text className="text-lg font-semibold text-gray-900">
-            At-Risk Students
-          </Text>
-          <Text className="text-sm text-gray-600">
-            Students with attendance below 75%
-          </Text>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="p-4"
-        >
-          {attendanceStats.map((dept) => (
-            <View
-              key={dept.department}
-              className="mr-4 bg-red-50 p-3 rounded-lg min-w-[150px]"
-            >
-              <Text className="text-sm font-semibold text-gray-900 mb-1">
-                {dept.department}
-              </Text>
-              <Text className="text-2xl font-bold text-red-600 mb-1">
-                {dept.atRiskCount}
-              </Text>
-              <Text className="text-xs text-gray-600">students at risk</Text>
-            </View>
-          ))}
-        </ScrollView>
-      </View>
-    </View>
-  );
-
-  const renderFacultyPerformance = () => (
-    <View>
-      <Text className="text-xl font-semibold text-gray-900 mb-4">
-        Faculty Performance
-      </Text>
-      <View className="bg-white rounded-xl shadow-md">
-        {facultyPerformance.map((faculty, index) => (
-          <View
-            key={faculty.teacherId}
-            className={`p-4 ${index < facultyPerformance.length - 1 ? "border-b border-gray-200" : ""}`}
-          >
-            <View className="flex-row justify-between items-start mb-2">
-              <Text className="text-base font-semibold text-gray-900">
-                {faculty.name}
-              </Text>
-              <Text
-                className={`text-base font-bold ${faculty.performanceRate >= 95 ? "text-green-600" : faculty.performanceRate >= 90 ? "text-orange-600" : "text-red-600"}`}
-              >
-                {faculty.performanceRate}%
-              </Text>
-            </View>
-            <View className="flex-row justify-between mb-1">
-              <Text className="text-sm text-gray-600">Scheduled Classes</Text>
-              <Text className="text-sm text-gray-900">
-                {faculty.scheduledClasses}
-              </Text>
-            </View>
-            <View className="flex-row justify-between mb-1">
-              <Text className="text-sm text-gray-600">Conducted Classes</Text>
-              <Text className="text-sm text-green-600">
-                {faculty.conductedClasses}
-              </Text>
-            </View>
-            <View className="flex-row justify-between">
-              <Text className="text-sm text-gray-600">Missed Classes</Text>
-              <Text className="text-sm text-red-600">
-                {faculty.missedClasses}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: () => {
+          logout();
+          router.replace("/auth/login");
+        },
+      },
+    ]);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       <StatusBar barStyle="dark-content" backgroundColor="#f5f7fa" />
-
-      {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-4 bg-white border-b border-gray-200">
         <TouchableOpacity
           className="w-10 h-10 rounded-full bg-gray-100 justify-center items-center"
-          onPress={() => router.back()}
+          onPress={handleLogout}
         >
           <Text className="text-xl text-gray-700">←</Text>
         </TouchableOpacity>
@@ -553,7 +231,6 @@ export default function AdminDashboard() {
         </Text>
         <View className="w-10" />
       </View>
-
       {/* Navigation Tabs */}
       <View className="bg-white border-b border-gray-200">
         <ScrollView
@@ -585,141 +262,40 @@ export default function AdminDashboard() {
           ))}
         </ScrollView>
       </View>
-
       {/* Content */}
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
       >
-        {selectedSection === "overview" && renderOverview()}
-        {selectedSection === "users" && renderUserManagement()}
-        {selectedSection === "reports" && renderReports()}
-        {selectedSection === "performance" && renderFacultyPerformance()}
+        {selectedSection === "overview" && (
+          <Overview
+            attendanceStats={attendanceStats}
+            totalStudents={totalStudents}
+            totalAtRisk={totalAtRisk}
+            overallAttendanceRate={overallAttendanceRate}
+            facultyPerformance={facultyPerformance}
+          />
+        )}
+        {selectedSection === "users" && (
+          <Users users={users} onAddUser={() => setShowUserModal(true)} />
+        )}
+        {selectedSection === "reports" && (
+          <Reports
+            attendanceStats={attendanceStats}
+            onExport={handleExportReport}
+          />
+        )}
+        {selectedSection === "performance" && (
+          <Faculty facultyPerformance={facultyPerformance} />
+        )}
       </ScrollView>
-
-      {/* Add User Modal */}
-      <Modal visible={showUserModal} transparent animationType="slide">
-        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
-          <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <View className="bg-white rounded-xl p-6 mx-4 w-full max-w-md">
-              <Text className="text-xl font-semibold text-gray-900 mb-4">
-                Add New User
-              </Text>
-
-              {/* Photo Section */}
-              <View className="items-center mb-4">
-                <View className="mb-2">
-                  {newUser.photoUri ? (
-                    <Image
-                      source={{ uri: newUser.photoUri }}
-                      className="w-24 h-24 rounded-full bg-gray-200"
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View className="w-24 h-24 rounded-full bg-gray-300 justify-center items-center">
-                      <Text className="text-2xl text-gray-600">📷</Text>
-                    </View>
-                  )}
-                </View>
-                <TouchableOpacity
-                  className="bg-blue-100 px-4 py-2 rounded-lg"
-                  onPress={showPhotoOptions}
-                >
-                  <Text className="text-blue-700 font-semibold">
-                    {newUser.photoUri ? "Change Photo" : "Add Photo"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <TextInput
-                className="border border-gray-300 rounded-lg p-3 mb-3"
-                placeholder="Full Name *"
-                value={newUser.name}
-                onChangeText={(text) => setNewUser({ ...newUser, name: text })}
-              />
-
-              <TextInput
-                className="border border-gray-300 rounded-lg p-3 mb-3"
-                placeholder="Email Address *"
-                value={newUser.email}
-                onChangeText={(text) => setNewUser({ ...newUser, email: text })}
-                keyboardType="email-address"
-              />
-
-              <TextInput
-                className="border border-gray-300 rounded-lg p-3 mb-3"
-                placeholder={`${newUser.role === "teacher" ? "Teacher" : "Student"} ID *`}
-                value={newUser.userId}
-                onChangeText={(text) =>
-                  setNewUser({ ...newUser, userId: text })
-                }
-              />
-
-              <TextInput
-                className="border border-gray-300 rounded-lg p-3 mb-3"
-                placeholder="Department *"
-                value={newUser.department}
-                onChangeText={(text) =>
-                  setNewUser({ ...newUser, department: text })
-                }
-              />
-
-              <View className="flex-row justify-between mb-4">
-                <TouchableOpacity
-                  className={`flex-1 p-3 rounded-lg mr-2 ${newUser.role === "teacher" ? "bg-blue-600" : "bg-gray-200"}`}
-                  onPress={() => setNewUser({ ...newUser, role: "teacher" })}
-                >
-                  <Text
-                    className={`text-center font-semibold ${newUser.role === "teacher" ? "text-white" : "text-gray-700"}`}
-                  >
-                    Teacher
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 p-3 rounded-lg ml-2 ${newUser.role === "student" ? "bg-blue-600" : "bg-gray-200"}`}
-                  onPress={() => setNewUser({ ...newUser, role: "student" })}
-                >
-                  <Text
-                    className={`text-center font-semibold ${newUser.role === "student" ? "text-white" : "text-gray-700"}`}
-                  >
-                    Student
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <Text className="text-xs text-gray-500 mb-3 text-center">
-                * Required fields
-              </Text>
-
-              <View className="flex-row justify-between">
-                <TouchableOpacity
-                  className="flex-1 bg-gray-200 p-3 rounded-lg mr-2"
-                  onPress={() => setShowUserModal(false)}
-                >
-                  <Text className="text-center text-gray-700 font-semibold">
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="flex-1 bg-blue-600 p-3 rounded-lg ml-2"
-                  onPress={handleAddUser}
-                >
-                  <Text className="text-center text-white font-semibold">
-                    Add User
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </ScrollView>
-        </View>
-      </Modal>
+      {/* Add User Component */}
+      <AddUser
+        visible={showUserModal}
+        onClose={() => setShowUserModal(false)}
+        onCreated={() => {}}
+      />
     </SafeAreaView>
   );
 }
