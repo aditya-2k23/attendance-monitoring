@@ -66,8 +66,8 @@ export default function StudentTabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused, size }) => (
-            <MaterialIcons
-              name={focused ? "fact-check" : "check-circle-outline"}
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
               size={size || 24}
               color={color}
             />

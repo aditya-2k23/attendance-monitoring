@@ -1,12 +1,12 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import "../globals.css";
 
@@ -38,7 +38,6 @@ const weeklyTimetable = {
   Saturday: [
     { time: "10:00-12:00", subject: "Seminar", instructor: "Various", room: "Auditorium", type: "Seminar", color: "bg-pink-500" },
   ],
-  Sunday: [],
 };
 
 const timeSlots = [
@@ -46,7 +45,7 @@ const timeSlots = [
   "14:00-15:00", "15:00-16:00", "16:00-17:00"
 ];
 
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function StudentTimetable() {
   const [selectedDay, setSelectedDay] = useState("Monday");
@@ -120,19 +119,8 @@ export default function StudentTimetable() {
             {selectedDay} Schedule
           </Text>
 
-          {selectedDay === "Sunday" ? (
-            <View className="bg-white rounded-xl p-8 shadow-md items-center">
-              <MaterialIcons name="free-breakfast" size={48} color="#9ca3af" />
-              <Text className="text-lg font-semibold text-gray-900 mt-4 mb-2">
-                No Classes Today
-              </Text>
-              <Text className="text-sm text-gray-600 text-center">
-                Enjoy your day off! Use this time to study, relax, or catch up on assignments.
-              </Text>
-            </View>
-          ) : (
-            <View className="space-y-3">
-              {getCurrentDayClasses().map((class_item, index) => (
+          <View className="space-y-3">
+            {getCurrentDayClasses().map((class_item, index) => (
                 <View key={index} className="bg-white rounded-xl p-4 shadow-md">
                   <View className="flex-row items-center mb-3">
                     <View className={`w-10 h-10 rounded-full ${class_item.color} items-center justify-center mr-3`}>
@@ -179,81 +167,13 @@ export default function StudentTimetable() {
                 </View>
               ))}
             </View>
-          )}
         </View>
 
         {/* Weekly Overview Grid */}
-        <View className="mb-6">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Weekly Overview
-          </Text>
-          
-          <View className="bg-white rounded-xl p-4 shadow-md">
-            <View className="space-y-3">
-              {days.map((day) => {
-                const dayClasses = weeklyTimetable[day as keyof typeof weeklyTimetable];
-                const classCount = Array.isArray(dayClasses) ? dayClasses.length : 0;
-                
-                return (
-                  <TouchableOpacity
-                    key={day}
-                    className="flex-row justify-between items-center py-2"
-                    onPress={() => setSelectedDay(day)}
-                  >
-                    <Text className={`text-base font-medium ${
-                      selectedDay === day ? 'text-blue-600' : 'text-gray-900'
-                    }`}>
-                      {day}
-                    </Text>
-                    <View className="flex-row items-center">
-                      <Text className="text-sm text-gray-600 mr-2">
-                        {day === "Sunday" ? "Holiday" : `${classCount} classes`}
-                      </Text>
-                      <MaterialIcons 
-                        name="chevron-right" 
-                        size={20} 
-                        color={selectedDay === day ? "#2563eb" : "#9ca3af"} 
-                      />
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        </View>
+        
 
         {/* Quick Stats */}
-        <View className="bg-white rounded-xl p-5 shadow-md">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Weekly Summary
-          </Text>
-          <View className="flex-row justify-between">
-            <View className="items-center flex-1">
-              <Text className="text-2xl font-bold text-blue-500">
-                {Object.values(weeklyTimetable).flat().filter(item => item && typeof item === 'object').length}
-              </Text>
-              <Text className="text-xs text-gray-600 text-center">
-                Total Classes
-              </Text>
-            </View>
-            <View className="items-center flex-1">
-              <Text className="text-2xl font-bold text-green-500">
-                {Object.values(weeklyTimetable).flat().filter(item => item && typeof item === 'object' && item.type === 'Lecture').length}
-              </Text>
-              <Text className="text-xs text-gray-600 text-center">
-                Lectures
-              </Text>
-            </View>
-            <View className="items-center flex-1">
-              <Text className="text-2xl font-bold text-purple-500">
-                {Object.values(weeklyTimetable).flat().filter(item => item && typeof item === 'object' && item.type === 'Practical').length}
-              </Text>
-              <Text className="text-xs text-gray-600 text-center">
-                Practicals
-              </Text>
-            </View>
-          </View>
-        </View>
+        
       </ScrollView>
     </SafeAreaView>
   );
