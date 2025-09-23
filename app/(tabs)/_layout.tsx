@@ -1,7 +1,89 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function TabLayout() {
+  const { user } = useAuth();
+  
+  // If user is a student, show student-friendly navigation
+  if (user?.role === "student") {
+    return (
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: "#3b82f6", // blue-500
+          tabBarInactiveTintColor: "#9ca3af", // gray-400
+          tabBarStyle: {
+            backgroundColor: "white",
+            borderTopWidth: 1,
+            borderTopColor: "#e5e7eb", // gray-200
+            paddingBottom: 5,
+            paddingTop: 5,
+            height: 60,
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "600",
+          },
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Dashboard",
+            tabBarIcon: ({ color, focused, size }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={size || 24}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="tasks"
+          options={{
+            title: "Assignments",
+            tabBarIcon: ({ color, focused, size }) => (
+              <MaterialIcons
+                name={focused ? "assignment" : "assignment-ind"}
+                size={size || 24}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="classroom"
+          options={{
+            title: "Grades",
+            tabBarIcon: ({ color, focused, size }) => (
+              <MaterialIcons
+                name={focused ? "grade" : "star-outline"}
+                size={size || 24}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="messages"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color, focused, size }) => (
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                size={size || 24}
+                color={color}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    );
+  }
+
+  // Default teacher/admin navigation
   return (
     <Tabs
       screenOptions={{
