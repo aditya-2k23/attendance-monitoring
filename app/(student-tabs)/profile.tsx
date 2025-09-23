@@ -2,16 +2,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
-import "../globals.css";
 
 // Mock student profile data
 const studentProfile = {
@@ -86,9 +86,20 @@ const quickActions = [
 export default function StudentProfile() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [selectedTab, setSelectedTab] = useState<"personal" | "academic" | "settings">("personal");
+  const [selectedTab, setSelectedTab] = useState<
+    "personal" | "academic" | "settings"
+  >("personal");
 
   const handleLogout = () => {
+    // If web platform, use confirm dialog
+    if (Platform.OS === "web") {
+      if (confirm("Are you sure you want to logout?")) {
+        logout();
+        router.replace("/auth/login");
+      }
+      return;
+    }
+
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -109,12 +120,10 @@ export default function StudentProfile() {
       3: "This would show the academic calendar.",
       4: "This would open the student handbook.",
     };
-    
-    Alert.alert(
-      "Quick Action",
-      actions[actionId as keyof typeof actions],
-      [{ text: "OK" }]
-    );
+
+    Alert.alert("Quick Action", actions[actionId as keyof typeof actions], [
+      { text: "OK" },
+    ]);
   };
 
   const toggleNotification = (type: string) => {
@@ -163,7 +172,8 @@ export default function StudentProfile() {
               {studentProfile.personalInfo.studentId}
             </Text>
             <Text className="text-sm text-blue-600">
-              {studentProfile.academicInfo.major} • {studentProfile.academicInfo.year}
+              {studentProfile.academicInfo.major} •{" "}
+              {studentProfile.academicInfo.year}
             </Text>
           </View>
         </View>
@@ -171,7 +181,9 @@ export default function StudentProfile() {
 
       {/* Quick Actions */}
       <View className="bg-white px-5 py-4 border-b border-gray-200">
-        <Text className="text-sm font-semibold text-gray-900 mb-3">Quick Actions</Text>
+        <Text className="text-sm font-semibold text-gray-900 mb-3">
+          Quick Actions
+        </Text>
         <View className="flex-row justify-between">
           {quickActions.map((action) => (
             <TouchableOpacity
@@ -179,7 +191,9 @@ export default function StudentProfile() {
               className="items-center flex-1"
               onPress={() => handleQuickAction(action.id)}
             >
-              <View className={`w-12 h-12 rounded-full justify-center items-center ${action.color} mb-2`}>
+              <View
+                className={`w-12 h-12 rounded-full justify-center items-center ${action.color} mb-2`}
+              >
                 <MaterialIcons name={action.icon} size={20} color="white" />
               </View>
               <Text className="text-xs text-gray-600 text-center">
@@ -278,7 +292,9 @@ export default function StudentProfile() {
                 <View className="flex-row justify-between">
                   <Text className="text-sm text-gray-600">Date of Birth</Text>
                   <Text className="text-sm font-medium text-gray-900">
-                    {new Date(studentProfile.personalInfo.dateOfBirth).toLocaleDateString()}
+                    {new Date(
+                      studentProfile.personalInfo.dateOfBirth
+                    ).toLocaleDateString()}
                   </Text>
                 </View>
               </View>
@@ -346,19 +362,25 @@ export default function StudentProfile() {
                   </Text>
                 </View>
                 <View className="flex-row justify-between">
-                  <Text className="text-sm text-gray-600">Current Semester</Text>
+                  <Text className="text-sm text-gray-600">
+                    Current Semester
+                  </Text>
                   <Text className="text-sm font-medium text-gray-900">
                     {studentProfile.academicInfo.semester}
                   </Text>
                 </View>
                 <View className="flex-row justify-between">
-                  <Text className="text-sm text-gray-600">Academic Advisor</Text>
+                  <Text className="text-sm text-gray-600">
+                    Academic Advisor
+                  </Text>
                   <Text className="text-sm font-medium text-gray-900">
                     {studentProfile.academicInfo.advisor}
                   </Text>
                 </View>
                 <View className="flex-row justify-between">
-                  <Text className="text-sm text-gray-600">Expected Graduation</Text>
+                  <Text className="text-sm text-gray-600">
+                    Expected Graduation
+                  </Text>
                   <Text className="text-sm font-medium text-gray-900">
                     {studentProfile.academicInfo.expectedGraduation}
                   </Text>
@@ -409,20 +431,26 @@ export default function StudentProfile() {
                 Notification Preferences
               </Text>
               <View className="space-y-4">
-                {Object.entries(studentProfile.preferences.notifications).map(([key, value]) => (
-                  <TouchableOpacity
-                    key={key}
-                    className="flex-row justify-between items-center"
-                    onPress={() => toggleNotification(key)}
-                  >
-                    <Text className="text-sm text-gray-700 capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                    </Text>
-                    <View className={`w-12 h-6 rounded-full ${value ? 'bg-blue-500' : 'bg-gray-300'}`}>
-                      <View className={`w-5 h-5 rounded-full bg-white m-0.5 ${value ? 'ml-6' : 'ml-0.5'}`} />
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                {Object.entries(studentProfile.preferences.notifications).map(
+                  ([key, value]) => (
+                    <TouchableOpacity
+                      key={key}
+                      className="flex-row justify-between items-center"
+                      onPress={() => toggleNotification(key)}
+                    >
+                      <Text className="text-sm text-gray-700 capitalize">
+                        {key.replace(/([A-Z])/g, " $1").trim()}
+                      </Text>
+                      <View
+                        className={`w-12 h-6 rounded-full ${value ? "bg-blue-500" : "bg-gray-300"}`}
+                      >
+                        <View
+                          className={`w-5 h-5 rounded-full bg-white m-0.5 ${value ? "ml-6" : "ml-0.5"}`}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  )
+                )}
               </View>
             </View>
 
@@ -432,20 +460,26 @@ export default function StudentProfile() {
                 Privacy Settings
               </Text>
               <View className="space-y-4">
-                {Object.entries(studentProfile.preferences.privacy).map(([key, value]) => (
-                  <TouchableOpacity
-                    key={key}
-                    className="flex-row justify-between items-center"
-                    onPress={() => toggleNotification(key)}
-                  >
-                    <Text className="text-sm text-gray-700 capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                    </Text>
-                    <View className={`w-12 h-6 rounded-full ${value ? 'bg-blue-500' : 'bg-gray-300'}`}>
-                      <View className={`w-5 h-5 rounded-full bg-white m-0.5 ${value ? 'ml-6' : 'ml-0.5'}`} />
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                {Object.entries(studentProfile.preferences.privacy).map(
+                  ([key, value]) => (
+                    <TouchableOpacity
+                      key={key}
+                      className="flex-row justify-between items-center"
+                      onPress={() => toggleNotification(key)}
+                    >
+                      <Text className="text-sm text-gray-700 capitalize">
+                        {key.replace(/([A-Z])/g, " $1").trim()}
+                      </Text>
+                      <View
+                        className={`w-12 h-6 rounded-full ${value ? "bg-blue-500" : "bg-gray-300"}`}
+                      >
+                        <View
+                          className={`w-5 h-5 rounded-full bg-white m-0.5 ${value ? "ml-6" : "ml-0.5"}`}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  )
+                )}
               </View>
             </View>
 
@@ -461,13 +495,17 @@ export default function StudentProfile() {
                 </TouchableOpacity>
                 <TouchableOpacity className="flex-row items-center py-2">
                   <MaterialIcons name="download" size={20} color="#10b981" />
-                  <Text className="text-sm text-gray-700 ml-3">Export Data</Text>
+                  <Text className="text-sm text-gray-700 ml-3">
+                    Export Data
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="flex-row items-center py-2">
                   <MaterialIcons name="help" size={20} color="#f59e0b" />
-                  <Text className="text-sm text-gray-700 ml-3">Help & Support</Text>
+                  <Text className="text-sm text-gray-700 ml-3">
+                    Help & Support
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
+                <TouchableOpacity
                   className="flex-row items-center py-2"
                   onPress={handleLogout}
                 >

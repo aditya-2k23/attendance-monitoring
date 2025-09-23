@@ -2,16 +2,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
-import "../globals.css";
 
 export default function HomeTab() {
   const router = useRouter();
@@ -26,6 +26,14 @@ export default function HomeTab() {
   }, [user]);
 
   const handleLogout = () => {
+    if (Platform.OS === "web") {
+      if (confirm("Are you sure you want to logout?")) {
+        logout();
+        router.replace("/auth/login");
+      }
+      return;
+    }
+
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -79,7 +87,7 @@ export default function HomeTab() {
           <View className="flex-row justify-between items-center mt-5 mb-8">
             <View className="flex-1">
               <Text className="text-2xl font-semibold text-gray-900 mb-1">
-                Welcome back, {user?.name?.split(' ')[0] || "Student"}!
+                Welcome back, {user?.name?.split(" ")[0] || "Student"}!
               </Text>
               <Text className="text-sm text-gray-600">
                 Ready for today&apos;s learning journey?
@@ -101,7 +109,9 @@ export default function HomeTab() {
           {/* Student Stats */}
           <View className="flex-row justify-between mb-8">
             <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-              <Text className="text-2xl font-bold text-green-600 mb-1">85%</Text>
+              <Text className="text-2xl font-bold text-green-600 mb-1">
+                85%
+              </Text>
               <Text className="text-xs text-gray-600 text-center">
                 Attendance
               </Text>
@@ -113,7 +123,9 @@ export default function HomeTab() {
               </Text>
             </View>
             <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-              <Text className="text-2xl font-bold text-green-500 mb-1">3.7</Text>
+              <Text className="text-2xl font-bold text-green-500 mb-1">
+                3.7
+              </Text>
               <Text className="text-xs text-gray-600 text-center">
                 Current GPA
               </Text>
@@ -126,7 +138,10 @@ export default function HomeTab() {
               🎓 Student Portal
             </Text>
             <Text className="text-blue-700 text-sm">
-              You&apos;re viewing the simplified student dashboard. The full student portal with detailed attendance tracking, assignments, grades, and profile management is available in the student tabs navigation.
+              You&apos;re viewing the simplified student dashboard. The full
+              student portal with detailed attendance tracking, assignments,
+              grades, and profile management is available in the student tabs
+              navigation.
             </Text>
           </View>
 
@@ -138,19 +153,27 @@ export default function HomeTab() {
             <View className="space-y-3">
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Student ID</Text>
-                <Text className="text-sm font-medium text-gray-900">STU-2024-001</Text>
+                <Text className="text-sm font-medium text-gray-900">
+                  STU-2024-001
+                </Text>
               </View>
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Major</Text>
-                <Text className="text-sm font-medium text-gray-900">Computer Science</Text>
+                <Text className="text-sm font-medium text-gray-900">
+                  Computer Science
+                </Text>
               </View>
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Year</Text>
-                <Text className="text-sm font-medium text-gray-900">Junior</Text>
+                <Text className="text-sm font-medium text-gray-900">
+                  Junior
+                </Text>
               </View>
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Semester</Text>
-                <Text className="text-sm font-medium text-gray-900">Fall 2025</Text>
+                <Text className="text-sm font-medium text-gray-900">
+                  Fall 2025
+                </Text>
               </View>
             </View>
           </View>

@@ -18,7 +18,9 @@ export default function Index() {
   if (isAuthenticated && user) {
     // Route to appropriate interface based on user role
     if (user.role === "student") {
-      return <Redirect href="/(student-tabs)" />;
+      return <Redirect href="/(student-tabs)/" />;
+    } else if (user.role === "admin") {
+      return <Redirect href="/admin-dashboard" />;
     } else {
       // Teachers, admins, and other roles go to regular tabs
       return <Redirect href="/(tabs)" />;
