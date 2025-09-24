@@ -1,17 +1,17 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
-export default function StudentLayout() {
+export default function FacultyLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#3b82f6", // blue-500
-        tabBarInactiveTintColor: "#9ca3af", // gray-400
+        tabBarActiveTintColor: "#3b82f6",
+        tabBarInactiveTintColor: "#9ca3af",
         tabBarStyle: {
           backgroundColor: "white",
           borderTopWidth: 1,
-          borderTopColor: "#e5e7eb", // gray-200
+          borderTopColor: "#e5e7eb",
           paddingBottom: 5,
           paddingTop: 5,
           height: 60,
@@ -25,7 +25,7 @@ export default function StudentLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Dashboard",
+          title: "Home",
           tabBarIcon: ({ color, focused, size }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
@@ -36,12 +36,12 @@ export default function StudentLayout() {
         }}
       />
       <Tabs.Screen
-        name="timetable"
+        name="tasks"
         options={{
-          title: "Timetable",
+          title: "Tasks",
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialIcons
-              name={focused ? "schedule" : "access-time"}
+              name={focused ? "task-alt" : "task"}
               size={size || 24}
               color={color}
             />
@@ -49,26 +49,13 @@ export default function StudentLayout() {
         }}
       />
       <Tabs.Screen
-        name="attendance"
+        name="classroom"
         options={{
-          title: "Attendance",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons
-              name={"fact-check"}
-              size={size || 24}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
+          title: "Classroom",
           tabBarIcon: ({ color, focused, size }) => (
-            <MaterialIcons
-              name={focused ? "person" : "person-outline"}
-              size={size || 24}
+            <FontAwesome5
+              name={focused ? "chalkboard-teacher" : "chalkboard"}
+              size={size || 22}
               color={color}
             />
           ),

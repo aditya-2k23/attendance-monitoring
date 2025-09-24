@@ -64,7 +64,7 @@ const mockData = {
     },
   ],
   subjectLectures: {
-    "Mathematics": [
+    Mathematics: [
       {
         id: 1,
         date: "Mon, 22 Sep, 2025",
@@ -101,7 +101,7 @@ const mockData = {
         status: "present",
       },
     ],
-    "Physics": [
+    Physics: [
       {
         id: 1,
         date: "Tue, 23 Sep, 2025",
@@ -124,7 +124,7 @@ const mockData = {
         status: "present",
       },
     ],
-    "Chemistry": [
+    Chemistry: [
       {
         id: 1,
         date: "Wed, 17 Sep, 2025",
@@ -140,7 +140,7 @@ const mockData = {
         status: "present",
       },
     ],
-    "English": [
+    English: [
       {
         id: 1,
         date: "Thu, 18 Sep, 2025",
@@ -149,7 +149,7 @@ const mockData = {
         status: "present",
       },
     ],
-    "Biology": [
+    Biology: [
       {
         id: 1,
         date: "Fri, 19 Sep, 2025",
@@ -186,7 +186,7 @@ export default function StudentAttendance() {
       <View className="bg-white px-5 py-4 border-b border-gray-200">
         <View className="flex-row items-center">
           {selectedSubject && (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setSelectedSubject(null)}
               className="mr-3"
             >
@@ -198,56 +198,75 @@ export default function StudentAttendance() {
               {selectedSubject ? selectedSubject : "My Attendance"}
             </Text>
             <Text className="text-sm text-gray-600 mt-1">
-              {selectedSubject ? "Lecture attendance history" : "Track your attendance record"}
+              {selectedSubject
+                ? "Lecture attendance history"
+                : "Track your attendance record"}
             </Text>
           </View>
         </View>
       </View>
-      
+
       <ScrollView className="flex-1">
         {selectedSubject ? (
           /* Subject Detail View */
           <View className="bg-white">
-            {(mockData.subjectLectures as any)[selectedSubject]?.map((lecture: any, index: number) => (
-              <View key={lecture.id} className="flex-row items-center px-5 py-4 border-b border-gray-100">
-                {/* Status Indicator */}
-                <View className="mr-4">
-                  <View className={`w-8 h-8 rounded-md items-center justify-center ${
-                    lecture.status === "present" ? "bg-green-500" : "bg-red-500"
-                  }`}>
-                    <Text className="text-white font-bold text-lg">P</Text>
+            {(mockData.subjectLectures as any)[selectedSubject]?.map(
+              (lecture: any, index: number) => (
+                <View
+                  key={lecture.id}
+                  className="flex-row items-center px-5 py-4 border-b border-gray-100"
+                >
+                  {/* Status Indicator */}
+                  <View className="mr-4">
+                    <View
+                      className={`w-8 h-8 rounded-md items-center justify-center ${
+                        lecture.status === "present"
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                    >
+                      <Text className="text-white font-bold text-lg">P</Text>
+                    </View>
+                    <View className="w-1 h-4 bg-green-500 ml-3.5 mt-1" />
                   </View>
-                  <View className="w-1 h-4 bg-green-500 ml-3.5 mt-1" />
+
+                  {/* Lecture Details */}
+                  <View className="flex-1">
+                    <Text className="text-base font-medium text-gray-900 mb-1">
+                      {lecture.date}{" "}
+                      <Text className="text-gray-500 font-normal">
+                        {lecture.time}
+                      </Text>
+                    </Text>
+                    <Text className="text-sm text-orange-500">
+                      {lecture.faculty}
+                    </Text>
+                  </View>
                 </View>
-                
-                {/* Lecture Details */}
-                <View className="flex-1">
-                  <Text className="text-base font-medium text-gray-900 mb-1">
-                    {lecture.date} <Text className="text-gray-500 font-normal">{lecture.time}</Text>
-                  </Text>
-                  <Text className="text-sm text-orange-500">
-                    {lecture.faculty}
-                  </Text>
-                </View>
-              </View>
-            ))}
+              )
+            )}
           </View>
         ) : (
           /* Main Overview */
           <>
             {/* Overview Section */}
             <View className="bg-white px-5 py-4">
-              <Text className="text-lg font-semibold text-gray-900 mb-4">Overview</Text>
-              
+              <Text className="text-lg font-semibold text-gray-900 mb-4">
+                Overview
+              </Text>
+
               {/* Overall Stats */}
               <View className="flex-row justify-between items-center mb-6 p-4 bg-blue-50 rounded-lg">
                 <View>
-                  <Text className="text-sm text-gray-600">Overall Attendance</Text>
+                  <Text className="text-sm text-gray-600">
+                    Overall Attendance
+                  </Text>
                   <Text className="text-2xl font-bold text-blue-600 mt-1">
                     {mockData.overview.overall.percentage}%
                   </Text>
                   <Text className="text-xs text-gray-500 mt-1">
-                    {mockData.overview.overall.presentDays} / {mockData.overview.overall.totalDays} days
+                    {mockData.overview.overall.presentDays} /{" "}
+                    {mockData.overview.overall.totalDays} days
                   </Text>
                 </View>
                 <View className="w-16 h-16 rounded-full bg-blue-100 items-center justify-center">
@@ -260,24 +279,34 @@ export default function StudentAttendance() {
               {/* This Month Stats */}
               <View className="flex-row justify-between mb-6">
                 <View className="flex-1 mr-2">
-                  <View className={`p-4 rounded-lg border ${getAttendanceBgColor(mockData.overview.thisMonth.percentage)}`}>
+                  <View
+                    className={`p-4 rounded-lg border ${getAttendanceBgColor(mockData.overview.thisMonth.percentage)}`}
+                  >
                     <Text className="text-sm text-gray-600">This Month</Text>
-                    <Text className={`text-xl font-bold mt-1 ${getAttendanceColor(mockData.overview.thisMonth.percentage)}`}>
+                    <Text
+                      className={`text-xl font-bold mt-1 ${getAttendanceColor(mockData.overview.thisMonth.percentage)}`}
+                    >
                       {mockData.overview.thisMonth.percentage}%
                     </Text>
                     <Text className="text-xs text-gray-500 mt-1">
-                      {mockData.overview.thisMonth.presentDays} / {mockData.overview.thisMonth.totalDays} days
+                      {mockData.overview.thisMonth.presentDays} /{" "}
+                      {mockData.overview.thisMonth.totalDays} days
                     </Text>
                   </View>
                 </View>
                 <View className="flex-1 ml-2">
-                  <View className={`p-4 rounded-lg border ${getAttendanceBgColor(mockData.overview.thisWeek.percentage)}`}>
+                  <View
+                    className={`p-4 rounded-lg border ${getAttendanceBgColor(mockData.overview.thisWeek.percentage)}`}
+                  >
                     <Text className="text-sm text-gray-600">This Week</Text>
-                    <Text className={`text-xl font-bold mt-1 ${getAttendanceColor(mockData.overview.thisWeek.percentage)}`}>
+                    <Text
+                      className={`text-xl font-bold mt-1 ${getAttendanceColor(mockData.overview.thisWeek.percentage)}`}
+                    >
                       {mockData.overview.thisWeek.percentage}%
                     </Text>
                     <Text className="text-xs text-gray-500 mt-1">
-                      {mockData.overview.thisWeek.presentDays} / {mockData.overview.thisWeek.totalDays} days
+                      {mockData.overview.thisWeek.presentDays} /{" "}
+                      {mockData.overview.thisWeek.totalDays} days
                     </Text>
                   </View>
                 </View>
@@ -286,21 +315,31 @@ export default function StudentAttendance() {
 
             {/* By Subject Section */}
             <View className="bg-white px-5 py-4 border-t border-gray-200">
-              <Text className="text-lg font-semibold text-gray-900 mb-4">By Subject</Text>
-              
+              <Text className="text-lg font-semibold text-gray-900 mb-4">
+                By Subject
+              </Text>
+
               {mockData.subjects.map((subject, index) => (
-                <TouchableOpacity 
-                  key={index} 
+                <TouchableOpacity
+                  key={index}
                   className="mb-4 p-4 bg-gray-50 rounded-lg"
                   onPress={() => setSelectedSubject(subject.name)}
                 >
                   <View className="flex-row justify-between items-center mb-2">
-                    <Text className="text-base font-medium text-gray-900">{subject.name}</Text>
+                    <Text className="text-base font-medium text-gray-900">
+                      {subject.name}
+                    </Text>
                     <View className="flex-row items-center">
-                      <Text className={`text-lg font-bold ${getAttendanceColor(subject.percentage)} mr-2`}>
+                      <Text
+                        className={`text-lg font-bold ${getAttendanceColor(subject.percentage)} mr-2`}
+                      >
                         {subject.percentage}%
                       </Text>
-                      <MaterialIcons name="chevron-right" size={20} color="#9CA3AF" />
+                      <MaterialIcons
+                        name="chevron-right"
+                        size={20}
+                        color="#9CA3AF"
+                      />
                     </View>
                   </View>
                   <View className="flex-row justify-between text-sm text-gray-600">
@@ -309,7 +348,13 @@ export default function StudentAttendance() {
                   </View>
                   <View className="flex-row justify-between text-xs text-gray-500 mt-1">
                     <Text>Required: {subject.requiredAttendance}%</Text>
-                    <Text className={subject.status === "Good" ? "text-green-600" : "text-red-600"}>
+                    <Text
+                      className={
+                        subject.status === "Good"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
                       {subject.status}
                     </Text>
                   </View>

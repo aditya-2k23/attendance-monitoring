@@ -55,36 +55,9 @@ const studentProfile = {
   },
 };
 
-const quickActions = [
-  {
-    id: 1,
-    title: "Update Contact Info",
-    icon: "contact-mail" as const,
-    color: "bg-blue-500",
-  },
-  {
-    id: 2,
-    title: "Change Password",
-    icon: "lock" as const,
-    color: "bg-green-500",
-  },
-  {
-    id: 3,
-    title: "Academic Calendar",
-    icon: "calendar-today" as const,
-    color: "bg-purple-500",
-  },
-  {
-    id: 4,
-    title: "Student Handbook",
-    icon: "menu-book" as const,
-    color: "bg-orange-500",
-  },
-];
-
 export default function StudentProfile() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -98,29 +71,6 @@ export default function StudentProfile() {
         },
       },
     ]);
-  };
-
-  const handleQuickAction = (actionId: number) => {
-    const actions = {
-      1: "This would open the contact information update form.",
-      2: "This would open the password change form.",
-      3: "This would show the academic calendar.",
-      4: "This would open the student handbook.",
-    };
-    
-    Alert.alert(
-      "Quick Action",
-      actions[actionId as keyof typeof actions],
-      [{ text: "OK" }]
-    );
-  };
-
-  const toggleNotification = (type: string) => {
-    Alert.alert(
-      "Notification Settings",
-      `This would toggle ${type} notifications.`,
-      [{ text: "OK" }]
-    );
   };
 
   return (
@@ -161,7 +111,8 @@ export default function StudentProfile() {
               {studentProfile.personalInfo.studentId}
             </Text>
             <Text className="text-sm text-blue-600">
-              {studentProfile.academicInfo.major} • {studentProfile.academicInfo.year}
+              {studentProfile.academicInfo.major} •{" "}
+              {studentProfile.academicInfo.year}
             </Text>
           </View>
         </View>
@@ -206,7 +157,9 @@ export default function StudentProfile() {
               <View className="flex-row justify-between">
                 <Text className="text-sm text-gray-600">Date of Birth</Text>
                 <Text className="text-sm font-medium text-gray-900">
-                  {new Date(studentProfile.personalInfo.dateOfBirth).toLocaleDateString()}
+                  {new Date(
+                    studentProfile.personalInfo.dateOfBirth
+                  ).toLocaleDateString()}
                 </Text>
               </View>
             </View>
@@ -282,7 +235,9 @@ export default function StudentProfile() {
                 </Text>
               </View>
               <View className="flex-row justify-between">
-                <Text className="text-sm text-gray-600">Expected Graduation</Text>
+                <Text className="text-sm text-gray-600">
+                  Expected Graduation
+                </Text>
                 <Text className="text-sm font-medium text-gray-900">
                   {studentProfile.academicInfo.expectedGraduation}
                 </Text>
