@@ -10,50 +10,6 @@ import {
 } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
 
-// Subject-wise attendance data
-const subjectAttendance = [
-  {
-    subject: "Physics",
-    attended: 18,
-    total: 20,
-    percentage: 90,
-    color: "#3b82f6", // blue
-    instructor: "Dr. Smith",
-  },
-  {
-    subject: "Mathematics",
-    attended: 16,
-    total: 20,
-    percentage: 80,
-    color: "#10b981", // green
-    instructor: "Prof. Johnson",
-  },
-  {
-    subject: "Chemistry",
-    attended: 17,
-    total: 20,
-    percentage: 85,
-    color: "#f59e0b", // yellow
-    instructor: "Dr. Brown",
-  },
-  {
-    subject: "Computer Science",
-    attended: 19,
-    total: 20,
-    percentage: 95,
-    color: "#8b5cf6", // purple
-    instructor: "Dr. Davis",
-  },
-  {
-    subject: "Biology",
-    attended: 15,
-    total: 18,
-    percentage: 83,
-    color: "#06b6d4", // cyan
-    instructor: "Prof. Wilson",
-  },
-];
-
 // Today's timetable
 const todaysTimetable = [
   {
@@ -94,37 +50,6 @@ const todaysTimetable = [
   },
 ];
 
-// Exam schedule
-const upcomingExams = [
-  {
-    subject: "Physics",
-    type: "Mid-term Exam",
-    date: "2025-09-28",
-    time: "10:00 AM",
-    room: "Exam Hall A",
-    marks: 100,
-    daysLeft: 6,
-  },
-  {
-    subject: "Mathematics",
-    type: "Quiz",
-    date: "2025-09-25",
-    time: "11:00 AM",
-    room: "Hall room 205",
-    marks: 25,
-    daysLeft: 3,
-  },
-  {
-    subject: "Chemistry",
-    type: "Lab Test",
-    date: "2025-09-30",
-    time: "02:00 PM",
-    room: "Lab 103",
-    marks: 50,
-    daysLeft: 8,
-  },
-];
-
 const studentInfo = {
   name: "Alice Johnson",
   studentId: "STU-2024-001",
@@ -147,64 +72,18 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   size = 80,
   color = "#3b82f6",
 }) => {
-  const strokeWidth = 6;
-
-  // Create smooth progress using many small arcs
-  const createProgressArc = () => {
-    const totalDegrees = (percentage / 100) * 360;
-    const segments = [];
-    const segmentCount = Math.max(20, Math.floor(totalDegrees / 5)); // At least 20 segments
-
-    for (
-      let i = 0;
-      i < segmentCount && i * (360 / segmentCount) < totalDegrees;
-      i++
-    ) {
-      const rotation = (360 / segmentCount) * i - 90; // Start from top
-
-      segments.push(
-        <View
-          key={i}
-          className="absolute"
-          style={{
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            borderWidth: strokeWidth,
-            borderColor: "transparent",
-            borderTopColor: color,
-            transform: [{ rotate: `${rotation}deg` }],
-          }}
-        />
-      );
-    }
-    return segments;
-  };
-
   return (
     <View
       style={{ width: size, height: size }}
       className="justify-center items-center"
     >
-      {/* Background Circle */}
-      <View
-        className="absolute"
-        style={{
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          borderWidth: strokeWidth,
-          borderColor: "#e5e7eb",
-        }}
-      />
-
-      {/* Progress Arc */}
-      {createProgressArc()}
-
-      {/* Center Text */}
+      {/* Center Text Only */}
       <View className="absolute justify-center items-center">
-        <Text className="text-base font-bold" style={{ color: "#374151" }}>
+        <Text className="text-2xl font-bold" style={{ color: "#10b981" }}>
           {percentage}%
+        </Text>
+        <Text className="text-sm font-medium mt-1" style={{ color: "#6b7280" }}>
+          Attendance
         </Text>
       </View>
     </View>
@@ -269,32 +148,6 @@ export default function StudentDashboard() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
       >
         {/* Quick Stats */}
-        <View className="flex-row justify-between mb-6">
-          <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-            <Text className="text-2xl font-bold text-green-500">
-              {studentInfo.overallAttendance}%
-            </Text>
-            <Text className="text-xs text-gray-600 text-center">
-              Attendance
-            </Text>
-          </View>
-          <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-            <Text className="text-2xl font-bold text-orange-500">
-              {upcomingExams.length}
-            </Text>
-            <Text className="text-xs text-gray-600 text-center">
-              Pending Tasks
-            </Text>
-          </View>
-          <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-            <Text className="text-2xl font-bold text-blue-500">
-              {studentInfo.cgpa}
-            </Text>
-            <Text className="text-xs text-gray-600 text-center">
-              Current GPA
-            </Text>
-          </View>
-        </View>
 
         {/* Quick Overview */}
         <View className="bg-white rounded-xl p-5 shadow-md mb-6">
@@ -331,28 +184,46 @@ export default function StudentDashboard() {
         {/* Attendance Overview with Circular Charts */}
         <View className="bg-white rounded-xl p-5 shadow-md mb-6">
           <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Subject-wise Attendance
+            Overall Attendance
           </Text>
 
-          <View className="flex-row flex-wrap justify-between">
-            {subjectAttendance.slice(0, 4).map((subject, index) => (
-              <View key={index} className="w-[48%] items-center mb-4">
-                <CircularProgress
-                  percentage={subject.percentage}
-                  color={getAttendanceColor(subject.percentage)}
-                  size={70}
-                />
-                <Text className="text-sm font-medium text-gray-900 mt-2 text-center">
-                  {subject.subject}
-                </Text>
-                <Text className="text-xs text-gray-600 text-center">
-                  {subject.attended}/{subject.total} classes
-                </Text>
-              </View>
-            ))}
+          <View className="items-center justify-center py-6">
+            <View className="relative">
+              {/* Circular Background */}
+              <View
+                className="absolute rounded-full"
+                style={{
+                  width: 140,
+                  height: 140,
+                  backgroundColor:
+                    studentInfo.overallAttendance >= 85
+                      ? "#dcfce7"
+                      : studentInfo.overallAttendance >= 75
+                        ? "#fef3c7"
+                        : "#fee2e2",
+                  top: -10,
+                  left: -10,
+                }}
+              />
+              <CircularProgress
+                percentage={studentInfo.overallAttendance}
+                color={getAttendanceColor(studentInfo.overallAttendance)}
+                size={120}
+              />
+            </View>
+            <Text className="text-base font-medium text-gray-900 mt-4 text-center">
+              Overall Attendance
+            </Text>
+            <Text className="text-sm text-gray-600 text-center">
+              {studentInfo.attendedLectures}/{studentInfo.totalLectures} total
+              classes
+            </Text>
           </View>
 
-          <TouchableOpacity className="bg-blue-50 rounded-lg p-3 mt-2">
+          <TouchableOpacity
+            className="bg-blue-50 rounded-lg p-3 mt-2"
+            onPress={() => router.push("/(student-tabs)/attendance")}
+          >
             <Text className="text-blue-600 text-center font-medium">
               View Detailed Attendance
             </Text>
@@ -360,10 +231,16 @@ export default function StudentDashboard() {
         </View>
 
         {/* Today's Timetable */}
-        <View className="bg-white rounded-xl p-5 shadow-md mb-6">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Today’s Timetable
-          </Text>
+        <TouchableOpacity
+          className="bg-white rounded-xl p-5 shadow-md mb-6"
+          onPress={() => router.push("/(student-tabs)/timetable")}
+        >
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-semibold text-gray-900">
+              Today&apos;s Timetable
+            </Text>
+            <MaterialIcons name="chevron-right" size={20} color="#9CA3AF" />
+          </View>
 
           <View className="space-y-3">
             {todaysTimetable.map((class_item, index) => (
@@ -405,93 +282,7 @@ export default function StudentDashboard() {
               </View>
             ))}
           </View>
-        </View>
-
-        {/* Exams Section */}
-        <View className="bg-white rounded-xl p-5 shadow-md mb-6">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Upcoming Exams
-          </Text>
-
-          <View className="space-y-3">
-            {upcomingExams.map((exam, index) => (
-              <View
-                key={index}
-                className="border-l-4 border-red-400 bg-red-50 rounded-lg p-3"
-              >
-                <View className="flex-row justify-between items-start">
-                  <View className="flex-1">
-                    <Text className="text-base font-semibold text-gray-900">
-                      {exam.subject}
-                    </Text>
-                    <Text className="text-sm text-gray-600">
-                      {exam.type} • {exam.marks} marks
-                    </Text>
-                    <Text className="text-sm text-gray-600 mt-1">
-                      {exam.time} • {exam.room}
-                    </Text>
-                  </View>
-                  <View className="items-end">
-                    <View className="bg-red-100 px-2 py-1 rounded-lg">
-                      <Text className="text-red-700 text-xs font-medium">
-                        {exam.daysLeft} days left
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Overall Statistics */}
-        <View className="bg-white rounded-xl p-5 shadow-md mb-6">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Academic Statistics
-          </Text>
-
-          <View className="space-y-4">
-            <View>
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-sm text-gray-600">Total Lectures</Text>
-                <Text className="text-sm font-medium text-gray-900">
-                  {studentInfo.attendedLectures}/{studentInfo.totalLectures}
-                </Text>
-              </View>
-              <View className="w-full h-2 bg-gray-200 rounded-full">
-                <View
-                  className="h-2 bg-blue-500 rounded-full"
-                  style={{
-                    width: `${(studentInfo.attendedLectures / studentInfo.totalLectures) * 100}%`,
-                  }}
-                />
-              </View>
-            </View>
-
-            <View>
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-sm text-gray-600">
-                  Overall Attendance
-                </Text>
-                <Text className="text-sm font-medium text-gray-900">
-                  {studentInfo.overallAttendance}%
-                </Text>
-              </View>
-              <View className="w-full h-2 bg-gray-200 rounded-full">
-                <View
-                  className={`h-2 rounded-full ${
-                    studentInfo.overallAttendance >= 85
-                      ? "bg-green-500"
-                      : studentInfo.overallAttendance >= 75
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                  }`}
-                  style={{ width: `${studentInfo.overallAttendance}%` }}
-                />
-              </View>
-            </View>
-          </View>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
