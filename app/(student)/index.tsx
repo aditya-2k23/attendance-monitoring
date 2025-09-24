@@ -146,8 +146,6 @@ export default function StudentDashboard() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
       >
-        {/* Quick Stats */}
-
         {/* Quick Overview */}
         <View className="bg-white rounded-xl p-5 shadow-md mb-6">
           <Text className="text-lg font-semibold text-gray-900 mb-4">
@@ -221,7 +219,7 @@ export default function StudentDashboard() {
 
           <TouchableOpacity
             className="bg-blue-50 rounded-lg p-3 mt-2"
-            onPress={() => router.push("/(student-tabs)/attendance")}
+            onPress={() => router.push("/(student)/attendance")}
           >
             <Text className="text-blue-600 text-center font-medium">
               View Detailed Attendance
@@ -232,7 +230,7 @@ export default function StudentDashboard() {
         {/* Today's Timetable */}
         <TouchableOpacity
           className="bg-white rounded-xl p-5 shadow-md mb-6"
-          onPress={() => router.push("/(student-tabs)/timetable")}
+          onPress={() => router.push("/(student)/timetable")}
         >
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-lg font-semibold text-gray-900">
