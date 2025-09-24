@@ -9,8 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
-import "../globals.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Mock student profile data
 const studentProfile = {
