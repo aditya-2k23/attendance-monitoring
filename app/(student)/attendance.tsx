@@ -176,10 +176,6 @@ export default function StudentAttendance() {
     return "bg-red-100";
   };
 
-  const getStatusColor = (status: string) => {
-    return status === "present" ? "bg-green-500" : "bg-red-500";
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
