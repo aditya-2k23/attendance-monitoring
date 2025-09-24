@@ -70,7 +70,6 @@ interface CircularProgressProps {
 const CircularProgress: React.FC<CircularProgressProps> = ({
   percentage,
   size = 80,
-  color = "#3b82f6",
 }) => {
   return (
     <View
