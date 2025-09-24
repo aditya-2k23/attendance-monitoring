@@ -122,9 +122,9 @@ export default function StudentProfile() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
       >
-        <View className="space-y-4">
+        <View className="space-y-8">
           {/* Personal Information */}
-          <View className="bg-white rounded-xl p-4 shadow-md">
+          <View className="bg-white rounded-xl p-4 shadow-md mb-6">
             <Text className="text-lg font-semibold text-gray-900 mb-4">
               Personal Information
             </Text>
@@ -159,39 +159,6 @@ export default function StudentProfile() {
                   {new Date(
                     studentProfile.personalInfo.dateOfBirth
                   ).toLocaleDateString()}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Emergency Contact */}
-          <View className="bg-white rounded-xl p-4 shadow-md">
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
-              Emergency Contact
-            </Text>
-            <View className="space-y-3">
-              <View className="flex-row justify-between">
-                <Text className="text-sm text-gray-600">Name</Text>
-                <Text className="text-sm font-medium text-gray-900">
-                  {studentProfile.emergencyContact.name}
-                </Text>
-              </View>
-              <View className="flex-row justify-between">
-                <Text className="text-sm text-gray-600">Relationship</Text>
-                <Text className="text-sm font-medium text-gray-900">
-                  {studentProfile.emergencyContact.relationship}
-                </Text>
-              </View>
-              <View className="flex-row justify-between">
-                <Text className="text-sm text-gray-600">Phone</Text>
-                <Text className="text-sm font-medium text-gray-900">
-                  {studentProfile.emergencyContact.phone}
-                </Text>
-              </View>
-              <View className="flex-row justify-between">
-                <Text className="text-sm text-gray-600">Email</Text>
-                <Text className="text-sm font-medium text-gray-900">
-                  {studentProfile.emergencyContact.email}
                 </Text>
               </View>
             </View>
