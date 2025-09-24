@@ -99,12 +99,18 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
   async function uploadPhotoToSupabase(uri: string | null) {
     if (!uri) return null;
     try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
       const filename = `${newUser.role}-${uuid.v4()}.jpg`;
+
+      // For React Native, we need to use FormData or ArrayBuffer
+      const response = await fetch(uri);
+      const arrayBuffer = await response.arrayBuffer();
+
       const { error } = await supabase.storage
-        .from("user-photos") // ensure this bucket exists
-        .upload(filename, blob, { upsert: true });
+        .from("student-photos") // ensure this bucket exists
+        .upload(filename, arrayBuffer, {
+          upsert: true,
+          contentType: "image/jpeg",
+        });
 
       if (error) {
         console.error("Supabase upload error:", error);
@@ -113,7 +119,7 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
 
       // If bucket is public:
       const publicUrl = supabase.storage
-        .from("user-photos")
+        .from("student-photos")
         .getPublicUrl(filename).data.publicUrl;
       return publicUrl || null;
     } catch (err) {
@@ -186,7 +192,6 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
           email: newUser.email,
           password: newUser.tempPassword,
           options: {
-            emailRedirectTo: undefined, // Disable email verification
             data: {
               full_name: newUser.name,
               role: newUser.role,
