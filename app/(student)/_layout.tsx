@@ -1,7 +1,7 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
-export default function StudentLayout() {
+export default function StudentTabLayout() {
   return (
     <Tabs
       screenOptions={{
@@ -27,8 +27,8 @@ export default function StudentLayout() {
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons
-              name={focused ? "home" : "home-outline"}
+            <MaterialIcons
+              name={focused ? "home-filled" : "home"}
               size={size || 24}
               color={color}
             />
@@ -52,9 +52,9 @@ export default function StudentLayout() {
         name="attendance"
         options={{
           title: "Attendance",
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, focused, size }) => (
             <MaterialIcons
-              name={"fact-check"}
+              name={focused ? "fact-check" : "check-circle-outline"}
               size={size || 24}
               color={color}
             />
