@@ -200,7 +200,7 @@ export default function EnrollmentManagement() {
   });
 
   const availableStudents = students.filter((student) => {
-    if (!selectedCourse) return true;
+    if (!selectedCourse) return false; // Don't show students if no course selected
 
     // Filter out students already enrolled in the selected course
     const isEnrolled = enrollments.some(
@@ -337,10 +337,22 @@ export default function EnrollmentManagement() {
       {/* Enroll Students Modal */}
       <Modal visible={showEnrollModal} transparent animationType="slide">
         <View className="flex-1 bg-black/60 justify-center items-center px-4">
-          <View className="bg-white rounded-2xl p-5 w-full max-w-md max-h-[80%]">
+          <View
+            className="bg-white rounded-2xl p-5 w-full max-w-md"
+            style={{ maxHeight: "85%" }}
+          >
             <Text className="text-xl font-bold text-gray-900 mb-4">
               Enroll Students
             </Text>
+
+            {/* Debug Info (remove in production) */}
+            <View className="mb-2 p-2 bg-yellow-50 rounded">
+              <Text className="text-xs text-gray-600">
+                Debug: Students: {students.length}, Courses: {courses.length},
+                Available: {availableStudents.length}, Selected:{" "}
+                {selectedStudents.length}
+              </Text>
+            </View>
 
             {/* Course Selection */}
             <View className="mb-4">
@@ -391,42 +403,59 @@ export default function EnrollmentManagement() {
             </View>
 
             {/* Students Selection */}
-            <View className="flex-1 mb-4">
+            <View className="mb-4" style={{ minHeight: 200, maxHeight: 300 }}>
               <Text className="text-sm font-medium text-gray-700 mb-2">
                 Select Students * ({selectedStudents.length} selected)
               </Text>
               <ScrollView
-                className="max-h-64"
+                style={{ flex: 1 }}
                 showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
               >
-                {availableStudents.map((student) => (
-                  <TouchableOpacity
-                    key={student.id}
-                    onPress={() => toggleStudentSelection(student.id)}
-                    className={`p-3 rounded-lg mb-2 border ${
-                      selectedStudents.includes(student.id)
-                        ? "bg-blue-50 border-blue-300"
-                        : "bg-gray-50 border-gray-200"
-                    }`}
-                  >
-                    <View className="flex-row items-center">
-                      <View className="flex-1">
-                        <Text className="font-medium text-gray-900">
-                          {student.full_name}
-                        </Text>
-                        <Text className="text-xs text-gray-500">
-                          {student.department} • Year{" "}
-                          {new Date().getFullYear() -
-                            student.enrollment_year +
-                            1}
-                        </Text>
+                {availableStudents.length > 0 ? (
+                  availableStudents.map((student) => (
+                    <TouchableOpacity
+                      key={student.id}
+                      onPress={() => toggleStudentSelection(student.id)}
+                      className={`p-3 rounded-lg mb-2 border ${
+                        selectedStudents.includes(student.id)
+                          ? "bg-blue-50 border-blue-300"
+                          : "bg-gray-50 border-gray-200"
+                      }`}
+                    >
+                      <View className="flex-row items-center">
+                        <View className="flex-1">
+                          <Text className="font-medium text-gray-900">
+                            {student.full_name}
+                          </Text>
+                          <Text className="text-xs text-gray-500">
+                            {student.department} • Year{" "}
+                            {new Date().getFullYear() -
+                              student.enrollment_year +
+                              1}
+                          </Text>
+                        </View>
+                        {selectedStudents.includes(student.id) && (
+                          <Text className="text-blue-600 text-lg">✓</Text>
+                        )}
                       </View>
-                      {selectedStudents.includes(student.id) && (
-                        <Text className="text-blue-600">✓</Text>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  ))
+                ) : selectedCourse ? (
+                  <View className="p-4 text-center">
+                    <Text className="text-gray-500 text-sm">
+                      {students.length === 0
+                        ? "No students found in the database"
+                        : "All students are already enrolled in this course"}
+                    </Text>
+                  </View>
+                ) : (
+                  <View className="p-4 text-center">
+                    <Text className="text-gray-500 text-sm">
+                      Please select a course first
+                    </Text>
+                  </View>
+                )}
               </ScrollView>
             </View>
 
@@ -460,7 +489,11 @@ export default function EnrollmentManagement() {
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
                   <Text className="text-center text-white font-semibold">
-                    Enroll
+                    {!selectedCourse
+                      ? "Select Course"
+                      : selectedStudents.length === 0
+                        ? "Select Students"
+                        : `Enroll ${selectedStudents.length} Student(s)`}
                   </Text>
                 )}
               </TouchableOpacity>
