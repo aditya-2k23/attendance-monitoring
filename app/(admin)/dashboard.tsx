@@ -22,7 +22,7 @@ import Users from "./components/Users";
 import { AttendanceStats, User } from "./types";
 
 export default function AdminDashboard() {
-  const [selectedSection, setSelectedSection] = useState<string>("overview");
+  const [selectedSection, setSelectedSection] = useState<string>("users");
   const [showUserModal, setShowUserModal] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const { logout } = useAuth();
