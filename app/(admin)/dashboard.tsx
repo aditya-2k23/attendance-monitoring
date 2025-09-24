@@ -13,11 +13,13 @@ import {
   View,
 } from "react-native";
 import AddUser from "./components/AddUser";
-import Faculty from "./components/Faculty";
-import Overview from "./components/Overview";
+import CourseManagement from "./components/CourseManagement";
+import EnrollmentManagement from "./components/EnrollmentManagement";
 import Reports from "./components/Reports";
+import SessionScheduler from "./components/SessionScheduler";
+import TeacherAssignment from "./components/TeacherAssignment";
 import Users from "./components/Users";
-import { AttendanceStats, FacultyPerformance, User } from "./types";
+import { AttendanceStats, User } from "./types";
 
 export default function AdminDashboard() {
   const [selectedSection, setSelectedSection] = useState<string>("overview");
@@ -61,41 +63,6 @@ export default function AdminDashboard() {
       presentToday: 195,
       averageRate: 93,
       atRiskCount: 5,
-    },
-  ];
-
-  const facultyPerformance: FacultyPerformance[] = [
-    {
-      teacherId: 1,
-      name: "Dr. Sarah Wilson",
-      scheduledClasses: 20,
-      conductedClasses: 19,
-      missedClasses: 1,
-      performanceRate: 95,
-    },
-    {
-      teacherId: 2,
-      name: "Prof. John Smith",
-      scheduledClasses: 18,
-      conductedClasses: 18,
-      missedClasses: 0,
-      performanceRate: 100,
-    },
-    {
-      teacherId: 3,
-      name: "Dr. Emily Davis",
-      scheduledClasses: 22,
-      conductedClasses: 20,
-      missedClasses: 2,
-      performanceRate: 91,
-    },
-    {
-      teacherId: 4,
-      name: "Prof. Michael Brown",
-      scheduledClasses: 16,
-      conductedClasses: 14,
-      missedClasses: 2,
-      performanceRate: 87,
     },
   ];
 
@@ -170,22 +137,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const totalStudents = attendanceStats.reduce(
-    (sum, stat) => sum + stat.totalStudents,
-    0
-  );
-  const totalPresent = attendanceStats.reduce(
-    (sum, stat) => sum + stat.presentToday,
-    0
-  );
-  const totalAtRisk = attendanceStats.reduce(
-    (sum, stat) => sum + stat.atRiskCount,
-    0
-  );
-  const overallAttendanceRate = Math.round(
-    (totalPresent / totalStudents) * 100
-  );
-
   const handleExportReport = (reportType: string) => {
     Alert.alert(
       "Export Report",
@@ -239,10 +190,12 @@ export default function AdminDashboard() {
           className="px-5 py-3"
         >
           {[
-            { key: "overview", label: "Overview" },
             { key: "users", label: "Users" },
+            { key: "courses", label: "Courses" },
+            { key: "enrollment", label: "Enrollment" },
+            { key: "assignments", label: "Assignments" },
+            { key: "sessions", label: "Sessions" },
             { key: "reports", label: "Reports" },
-            { key: "performance", label: "Faculty" },
           ].map((tab) => (
             <TouchableOpacity
               key={tab.key}
@@ -268,28 +221,21 @@ export default function AdminDashboard() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
       >
-        {selectedSection === "overview" && (
-          <Overview
-            attendanceStats={attendanceStats}
-            totalStudents={totalStudents}
-            totalAtRisk={totalAtRisk}
-            overallAttendanceRate={overallAttendanceRate}
-            facultyPerformance={facultyPerformance}
-          />
-        )}
         {selectedSection === "users" && (
           <Users users={users} onAddUser={() => setShowUserModal(true)} />
         )}
+        {selectedSection === "courses" && <CourseManagement />}
+        {selectedSection === "enrollment" && <EnrollmentManagement />}
+        {selectedSection === "assignments" && <TeacherAssignment />}
+        {selectedSection === "sessions" && <SessionScheduler />}
         {selectedSection === "reports" && (
           <Reports
             attendanceStats={attendanceStats}
             onExport={handleExportReport}
           />
         )}
-        {selectedSection === "performance" && (
-          <Faculty facultyPerformance={facultyPerformance} />
-        )}
       </ScrollView>
+
       {/* Add User Component */}
       <AddUser
         visible={showUserModal}
