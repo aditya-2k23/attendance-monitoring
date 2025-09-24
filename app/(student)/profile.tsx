@@ -56,7 +56,11 @@ const studentProfile = {
 
 export default function StudentProfile() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const academicYearDisplay =
+    typeof user?.enrollmentYear === "number"
+      ? new Date().getFullYear() - user.enrollmentYear + 1
+      : studentProfile.academicInfo.year;
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -99,19 +103,15 @@ export default function StudentProfile() {
         <View className="flex-row items-center">
           <View className="w-16 h-16 rounded-full bg-blue-500 justify-center items-center mr-4">
             <Text className="text-2xl font-bold text-white">
-              {studentProfile.personalInfo.name.charAt(0)}
+              {user?.name.charAt(0)}
             </Text>
           </View>
           <View className="flex-1">
             <Text className="text-lg font-semibold text-gray-900">
-              {studentProfile.personalInfo.name}
-            </Text>
-            <Text className="text-sm text-gray-600">
-              {studentProfile.personalInfo.studentId}
+              {user?.name || studentProfile.personalInfo.name}
             </Text>
             <Text className="text-sm text-blue-600">
-              {studentProfile.academicInfo.major} •{" "}
-              {studentProfile.academicInfo.year}
+              {studentProfile.academicInfo.major} • {academicYearDisplay}
             </Text>
           </View>
         </View>
