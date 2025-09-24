@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/utils/supabase";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import {
@@ -122,45 +123,101 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
   };
 
   const showPhotoOptions = () => {
-    Alert.alert("Add Photo", "Choose how you want to add a photo", [
-      { text: "Take Photo", onPress: handleTakePhoto },
-      { text: "Choose from Gallery", onPress: handleSelectPhoto },
-      { text: "Cancel", style: "cancel" },
-    ]);
+    Alert.alert(
+      "📸 Add Photo",
+      "Choose how you'd like to add a profile photo for the new user:",
+      [
+        {
+          text: "📷 Take Photo",
+          onPress: handleTakePhoto,
+          style: "default",
+        },
+        {
+          text: "🖼️ Choose from Gallery",
+          onPress: handleSelectPhoto,
+          style: "default",
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleTakePhoto = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (permissionResult.granted === false) {
-      Alert.alert("Permission Required", "Camera permission is needed.");
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-    if (!result.canceled && result.assets?.length) {
-      setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+    try {
+      const permissionResult =
+        await ImagePicker.requestCameraPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "📷 Camera Permission Required",
+          "Please allow camera access in your device settings to take photos.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Open Settings",
+              onPress: () => ImagePicker.requestCameraPermissionsAsync(),
+            },
+          ]
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: false,
+      });
+
+      if (!result.canceled && result.assets?.length) {
+        setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+      }
+    } catch (error) {
+      console.error("Camera error:", error);
+      Alert.alert("Camera Error", "Failed to access camera. Please try again.");
     }
   };
 
   const handleSelectPhoto = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      Alert.alert("Permission Required", "Photo library permission is needed.");
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-    if (!result.canceled && result.assets?.length) {
-      setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "🖼️ Photo Library Permission Required",
+          "Please allow photo library access in your device settings to select photos.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Open Settings",
+              onPress: () => ImagePicker.requestMediaLibraryPermissionsAsync(),
+            },
+          ]
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: false,
+      });
+
+      if (!result.canceled && result.assets?.length) {
+        setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+      }
+    } catch (error) {
+      console.error("Gallery error:", error);
+      Alert.alert(
+        "Gallery Error",
+        "Failed to access photo library. Please try again."
+      );
     }
   };
 
@@ -379,7 +436,7 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
             {/* Header */}
             <View className="items-center mb-4">
               <View className="w-12 h-12 rounded-full bg-blue-50 justify-center items-center">
-                <Text className="text-xl">👥</Text>
+                <MaterialIcons name="person-add" size={28} color="#3B82F6" />
               </View>
               <Text className="text-xl font-bold text-gray-800">
                 Add New User
@@ -404,7 +461,11 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
-                  <Text className="text-lg mb-0.5">👨‍🏫</Text>
+                  <FontAwesome
+                    name={newUser.role === "teacher" ? "user" : "user-o"}
+                    size={24}
+                    color={newUser.role === "teacher" ? "#fff" : "#4B5563"}
+                  />
                   <Text
                     className={`font-semibold text-sm ${
                       newUser.role === "teacher"
@@ -423,7 +484,11 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
-                  <Text className="text-lg mb-0.5">🎓</Text>
+                  <FontAwesome
+                    name="graduation-cap"
+                    size={24}
+                    color={newUser.role === "student" ? "#fff" : "#4B5563"}
+                  />
                   <Text
                     className={`font-semibold text-sm ${
                       newUser.role === "student"
@@ -439,30 +504,61 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
 
             {/* Photo Section */}
             <View className="items-center mb-4.5">
+              <Text className="text-base font-semibold text-gray-700 mb-3">
+                Profile Photo
+              </Text>
               {newUser.photoUri ? (
                 <View className="items-center">
-                  <Image
-                    source={{ uri: newUser.photoUri }}
-                    className="w-20 h-20 rounded-full mb-2 border-2 border-gray-200"
-                  />
-                  <TouchableOpacity
-                    onPress={showPhotoOptions}
-                    className="px-3 py-1.5 bg-gray-100 rounded-2xl border border-gray-300"
-                  >
-                    <Text className="text-gray-700 font-medium text-xs">
-                      Change Photo
-                    </Text>
-                  </TouchableOpacity>
+                  <View className="relative">
+                    <Image
+                      source={{ uri: newUser.photoUri }}
+                      className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-sm"
+                    />
+                    <View className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-2 border-white justify-center items-center">
+                      <Text className="text-white text-xs font-bold">✓</Text>
+                    </View>
+                  </View>
+                  <View className="flex-row gap-2 mt-3">
+                    <TouchableOpacity
+                      onPress={showPhotoOptions}
+                      className="px-4 py-2 bg-blue-50 rounded-xl border border-blue-200 flex-row items-center"
+                    >
+                      <Text className="text-blue-600 font-medium text-sm">
+                        Change
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setNewUser({ ...newUser, photoUri: null })}
+                      className="px-4 py-2 bg-red-50 rounded-xl border border-red-200 flex-row items-center"
+                    >
+                      <Text className="text-red-600 font-medium text-sm">
+                        Remove
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ) : (
                 <TouchableOpacity
                   onPress={showPhotoOptions}
-                  className="w-20 h-20 rounded-full bg-gray-50 border-2 border-gray-200 border-dashed justify-center items-center mb-2"
+                  className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 border-dashed justify-center items-center shadow-sm active:scale-95"
+                  style={{
+                    transform: [{ scale: 1 }],
+                    shadowColor: "#3B82F6",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                  }}
                 >
-                  <Text className="text-2xl">📷</Text>
-                  <Text className="text-xs text-gray-500 text-center">
-                    Add Photo
-                  </Text>
+                  <View className="items-center">
+                    <MaterialIcons
+                      name="add-a-photo"
+                      size={30}
+                      color="#3B82F6"
+                    />
+                    <Text className="text-xs text-blue-500 font-medium text-center px-2">
+                      Add Photo
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               )}
             </View>
