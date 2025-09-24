@@ -11,6 +11,7 @@ export default function RootLayout() {
         <Stack.Screen name="(faculty)" options={{ headerShown: false }} />
         <Stack.Screen name="(student)" options={{ headerShown: false }} />
         <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+        <Stack.Screen name="attendance" options={{ headerShown: false }} />
       </Stack>
     </AuthProvider>
   );

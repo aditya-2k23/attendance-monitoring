@@ -12,12 +12,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AttendanceStats, FacultyPerformance, User } from "../../types/admin";
 import AddUser from "./components/AddUser";
 import Faculty from "./components/Faculty";
 import Overview from "./components/Overview";
 import Reports from "./components/Reports";
 import Users from "./components/Users";
-import { AttendanceStats, FacultyPerformance, User } from "./types";
 
 export default function AdminDashboard() {
   const [selectedSection, setSelectedSection] = useState<string>("overview");
