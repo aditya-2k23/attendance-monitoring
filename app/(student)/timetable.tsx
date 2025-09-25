@@ -135,7 +135,6 @@ const weeklyTimetable = {
       color: "bg-pink-500",
     },
   ],
-  Sunday: [],
 };
 
 const days = [
@@ -145,7 +144,6 @@ const days = [
   "Thursday",
   "Friday",
   "Saturday",
-  "Sunday",
 ];
 
 export default function StudentTimetable() {
@@ -222,182 +220,69 @@ export default function StudentTimetable() {
             {selectedDay} Schedule
           </Text>
 
-          {selectedDay === "Sunday" ? (
-            <View className="bg-white rounded-xl p-8 shadow-md items-center">
-              <MaterialIcons name="free-breakfast" size={48} color="#9ca3af" />
-              <Text className="text-lg font-semibold text-gray-900 mt-4 mb-2">
-                No Classes Today
-              </Text>
-              <Text className="text-sm text-gray-600 text-center">
-                Enjoy your day off! Use this time to study, relax, or catch up
-                on assignments.
-              </Text>
-            </View>
-          ) : (
-            <View className="space-y-3">
-              {getCurrentDayClasses().map((class_item, index) => (
-                <View key={index} className="bg-white rounded-xl p-4 shadow-md">
-                  <View className="flex-row items-center mb-3">
-                    <View
-                      className={`w-10 h-10 rounded-full ${class_item.color} items-center justify-center mr-3`}
-                    >
-                      <MaterialIcons
-                        name={getTypeIcon(class_item.type)}
-                        size={20}
-                        color="white"
-                      />
-                    </View>
-                    <View className="flex-1">
-                      <Text className="text-base font-semibold text-gray-900">
-                        {class_item.subject}
-                      </Text>
-                      <Text className="text-sm text-gray-600">
-                        {class_item.instructor}
-                      </Text>
-                    </View>
-                    <View className="items-end">
-                      <Text className="text-sm font-medium text-gray-900">
-                        {class_item.time}
-                      </Text>
-                      <Text className="text-xs text-gray-600">
-                        {class_item.room}
-                      </Text>
-                    </View>
+          <View className="space-y-3">
+            {getCurrentDayClasses().map((class_item, index) => (
+              <View key={index} className="bg-white rounded-xl p-4 shadow-md">
+                <View className="flex-row items-center mb-3">
+                  <View
+                    className={`w-10 h-10 rounded-full ${class_item.color} items-center justify-center mr-3`}
+                  >
+                    <MaterialIcons
+                      name={getTypeIcon(class_item.type)}
+                      size={20}
+                      color="white"
+                    />
                   </View>
-                  <View className="flex-row justify-between items-center">
-                    <View
-                      className={`px-2 py-1 rounded-lg ${
-                        class_item.type === "Lecture"
-                          ? "bg-blue-100"
-                          : class_item.type === "Practical"
-                            ? "bg-green-100"
-                            : class_item.type === "Tutorial"
-                              ? "bg-purple-100"
-                              : class_item.type === "Project"
-                                ? "bg-indigo-100"
-                                : "bg-pink-100"
-                      }`}
-                    >
-                      <Text
-                        className={`text-xs font-medium ${
-                          class_item.type === "Lecture"
-                            ? "text-blue-700"
-                            : class_item.type === "Practical"
-                              ? "text-green-700"
-                              : class_item.type === "Tutorial"
-                                ? "text-purple-700"
-                                : class_item.type === "Project"
-                                  ? "text-indigo-700"
-                                  : "text-pink-700"
-                        }`}
-                      >
-                        {class_item.type}
-                      </Text>
-                    </View>
+                  <View className="flex-1">
+                    <Text className="text-base font-semibold text-gray-900">
+                      {class_item.subject}
+                    </Text>
+                    <Text className="text-sm text-gray-600">
+                      {class_item.instructor}
+                    </Text>
+                  </View>
+                  <View className="items-end">
+                    <Text className="text-sm font-medium text-gray-900">
+                      {class_item.time}
+                    </Text>
+                    <Text className="text-xs text-gray-600">
+                      {class_item.room}
+                    </Text>
                   </View>
                 </View>
-              ))}
-            </View>
-          )}
-        </View>
-
-        {/* Weekly Overview Grid */}
-        <View className="mb-6">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Weekly Overview
-          </Text>
-
-          <View className="bg-white rounded-xl p-4 shadow-md">
-            <View className="space-y-3">
-              {days.map((day) => {
-                const dayClasses =
-                  weeklyTimetable[day as keyof typeof weeklyTimetable];
-                const classCount = Array.isArray(dayClasses)
-                  ? dayClasses.length
-                  : 0;
-
-                return (
-                  <TouchableOpacity
-                    key={day}
-                    className="flex-row justify-between items-center py-2"
-                    onPress={() => setSelectedDay(day)}
+                <View className="flex-row justify-between items-center">
+                  <View
+                    className={`px-2 py-1 rounded-lg ${
+                      class_item.type === "Lecture"
+                        ? "bg-blue-100"
+                        : class_item.type === "Practical"
+                          ? "bg-green-100"
+                          : class_item.type === "Tutorial"
+                            ? "bg-purple-100"
+                            : class_item.type === "Project"
+                              ? "bg-indigo-100"
+                              : "bg-pink-100"
+                    }`}
                   >
                     <Text
-                      className={`text-base font-medium ${
-                        selectedDay === day ? "text-blue-600" : "text-gray-900"
+                      className={`text-xs font-medium ${
+                        class_item.type === "Lecture"
+                          ? "text-blue-700"
+                          : class_item.type === "Practical"
+                            ? "text-green-700"
+                            : class_item.type === "Tutorial"
+                              ? "text-purple-700"
+                              : class_item.type === "Project"
+                                ? "text-indigo-700"
+                                : "text-pink-700"
                       }`}
                     >
-                      {day}
+                      {class_item.type}
                     </Text>
-                    <View className="flex-row items-center">
-                      <Text className="text-sm text-gray-600 mr-2">
-                        {day === "Sunday" ? "Holiday" : `${classCount} classes`}
-                      </Text>
-                      <MaterialIcons
-                        name="chevron-right"
-                        size={20}
-                        color={selectedDay === day ? "#2563eb" : "#9ca3af"}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        </View>
-
-        {/* Quick Stats */}
-        <View className="bg-white rounded-xl p-5 shadow-md">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Weekly Summary
-          </Text>
-          <View className="flex-row justify-between">
-            <View className="items-center flex-1">
-              <Text className="text-2xl font-bold text-blue-500">
-                {
-                  Object.values(weeklyTimetable)
-                    .flat()
-                    .filter((item) => item && typeof item === "object").length
-                }
-              </Text>
-              <Text className="text-xs text-gray-600 text-center">
-                Total Classes
-              </Text>
-            </View>
-            <View className="items-center flex-1">
-              <Text className="text-2xl font-bold text-green-500">
-                {
-                  Object.values(weeklyTimetable)
-                    .flat()
-                    .filter(
-                      (item) =>
-                        item &&
-                        typeof item === "object" &&
-                        item.type === "Lecture"
-                    ).length
-                }
-              </Text>
-              <Text className="text-xs text-gray-600 text-center">
-                Lectures
-              </Text>
-            </View>
-            <View className="items-center flex-1">
-              <Text className="text-2xl font-bold text-purple-500">
-                {
-                  Object.values(weeklyTimetable)
-                    .flat()
-                    .filter(
-                      (item) =>
-                        item &&
-                        typeof item === "object" &&
-                        item.type === "Practical"
-                    ).length
-                }
-              </Text>
-              <Text className="text-xs text-gray-600 text-center">
-                Practicals
-              </Text>
-            </View>
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
         </View>
       </ScrollView>

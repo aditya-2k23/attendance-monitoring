@@ -1,117 +1,168 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// Mock student attendance data
-const attendanceData = {
-  overall: {
-    totalClasses: 120,
-    attendedClasses: 102,
-    percentage: 85,
-    target: 75, // Minimum required percentage
+const mockData = {
+  overview: {
+    overall: {
+      percentage: 87,
+      presentDays: 174,
+      totalDays: 200,
+    },
+    thisMonth: {
+      percentage: 92,
+      presentDays: 23,
+      totalDays: 25,
+    },
+    thisWeek: {
+      percentage: 80,
+      presentDays: 4,
+      totalDays: 5,
+    },
   },
   subjects: [
     {
-      id: 1,
-      name: "Physics",
-      totalClasses: 24,
-      attendedClasses: 22,
-      percentage: 92,
-      instructor: "Dr. Smith",
-      lastAttended: "2025-09-22",
-    },
-    {
-      id: 2,
       name: "Mathematics",
-      totalClasses: 26,
-      attendedClasses: 20,
-      percentage: 77,
-      instructor: "Prof. Johnson",
-      lastAttended: "2025-09-21",
+      percentage: 90,
+      presentClasses: 36,
+      totalClasses: 40,
+      requiredAttendance: 75,
+      status: "Good",
     },
     {
-      id: 3,
+      name: "Physics",
+      percentage: 85,
+      presentClasses: 34,
+      totalClasses: 40,
+      requiredAttendance: 75,
+      status: "Good",
+    },
+    {
       name: "Chemistry",
-      totalClasses: 22,
-      attendedClasses: 19,
-      percentage: 86,
-      instructor: "Dr. Brown",
-      lastAttended: "2025-09-22",
+      percentage: 82,
+      presentClasses: 33,
+      totalClasses: 40,
+      requiredAttendance: 75,
+      status: "Good",
     },
     {
-      id: 4,
-      name: "Biology",
-      totalClasses: 24,
-      attendedClasses: 21,
+      name: "English",
       percentage: 88,
-      instructor: "Prof. Wilson",
-      lastAttended: "2025-09-20",
+      presentClasses: 35,
+      totalClasses: 40,
+      requiredAttendance: 75,
+      status: "Good",
     },
     {
-      id: 5,
-      name: "Computer Science",
-      totalClasses: 24,
-      attendedClasses: 20,
-      percentage: 83,
-      instructor: "Dr. Davis",
-      lastAttended: "2025-09-22",
+      name: "Biology",
+      percentage: 95,
+      presentClasses: 38,
+      totalClasses: 40,
+      requiredAttendance: 75,
+      status: "Good",
     },
   ],
-  recentClasses: [
-    {
-      id: 1,
-      subject: "Physics",
-      date: "2025-09-22",
-      time: "09:30 - 10:30",
-      status: "present",
-      topic: "Force and Motion",
-    },
-    {
-      id: 2,
-      subject: "Chemistry",
-      date: "2025-09-22",
-      time: "01:30 - 02:30",
-      status: "present",
-      topic: "Organic Chemistry",
-    },
-    {
-      id: 3,
-      subject: "Mathematics",
-      date: "2025-09-21",
-      time: "11:00 - 12:00",
-      status: "present",
-      topic: "Calculus - Derivatives",
-    },
-    {
-      id: 4,
-      subject: "Computer Science",
-      date: "2025-09-21",
-      time: "02:00 - 03:00",
-      status: "absent",
-      topic: "Data Structures",
-    },
-    {
-      id: 5,
-      subject: "Biology",
-      date: "2025-09-20",
-      time: "10:00 - 11:00",
-      status: "present",
-      topic: "Cell Structure",
-    },
-  ],
+  subjectLectures: {
+    Mathematics: [
+      {
+        id: 1,
+        date: "Mon, 22 Sep, 2025",
+        time: "[L] - 11:00-12:00 AM",
+        faculty: "Faculty: Kumar Saurabh (UID: 32345)",
+        status: "present",
+      },
+      {
+        id: 2,
+        date: "Mon, 22 Sep, 2025",
+        time: "[L] - 12:00-01:00 PM",
+        faculty: "Faculty: Kumar Saurabh (UID: 32345)",
+        status: "present",
+      },
+      {
+        id: 3,
+        date: "Sat, 20 Sep, 2025",
+        time: "[L] - 11:00-12:00 AM",
+        faculty: "Faculty: Kumar Saurabh (UID: 32345)",
+        status: "present",
+      },
+      {
+        id: 4,
+        date: "Sat, 20 Sep, 2025",
+        time: "[L] - 12:00-01:00 PM",
+        faculty: "Faculty: Kumar Saurabh (UID: 32345)",
+        status: "present",
+      },
+      {
+        id: 5,
+        date: "Fri, 19 Sep, 2025",
+        time: "[L] - 11:00-12:00 AM",
+        faculty: "Faculty: Kumar Saurabh (UID: 32345)",
+        status: "present",
+      },
+    ],
+    Physics: [
+      {
+        id: 1,
+        date: "Tue, 23 Sep, 2025",
+        time: "[L] - 09:00-10:00 AM",
+        faculty: "Faculty: Dr. Sharma (UID: 12345)",
+        status: "present",
+      },
+      {
+        id: 2,
+        date: "Mon, 22 Sep, 2025",
+        time: "[L] - 09:00-10:00 AM",
+        faculty: "Faculty: Dr. Sharma (UID: 12345)",
+        status: "absent",
+      },
+      {
+        id: 3,
+        date: "Fri, 19 Sep, 2025",
+        time: "[L] - 09:00-10:00 AM",
+        faculty: "Faculty: Dr. Sharma (UID: 12345)",
+        status: "present",
+      },
+    ],
+    Chemistry: [
+      {
+        id: 1,
+        date: "Wed, 17 Sep, 2025",
+        time: "[L] - 02:00-03:00 PM",
+        faculty: "Faculty: Dr. Patel (UID: 54321)",
+        status: "present",
+      },
+      {
+        id: 2,
+        date: "Mon, 15 Sep, 2025",
+        time: "[L] - 02:00-03:00 PM",
+        faculty: "Faculty: Dr. Patel (UID: 54321)",
+        status: "present",
+      },
+    ],
+    English: [
+      {
+        id: 1,
+        date: "Thu, 18 Sep, 2025",
+        time: "[L] - 10:00-11:00 AM",
+        faculty: "Faculty: Ms. Johnson (UID: 67890)",
+        status: "present",
+      },
+    ],
+    Biology: [
+      {
+        id: 1,
+        date: "Fri, 19 Sep, 2025",
+        time: "[L] - 03:00-04:00 PM",
+        faculty: "Faculty: Dr. Singh (UID: 98765)",
+        status: "present",
+      },
+    ],
+  },
 };
 
 export default function StudentAttendance() {
-  const [selectedTab, setSelectedTab] = useState<
-    "overview" | "subjects" | "history"
-  >("overview");
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
   const getAttendanceColor = (percentage: number) => {
     if (percentage >= 85) return "text-green-500";
@@ -125,283 +176,188 @@ export default function StudentAttendance() {
     return "bg-red-100";
   };
 
-  const getStatusColor = (status: string) => {
-    return status === "present" ? "bg-green-500" : "bg-red-500";
-  };
-
-  const getStatusIcon = (status: string) => {
-    return status === "present" ? "check-circle" : "cancel";
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
-      <StatusBar barStyle="dark-content" backgroundColor="#f5f7fa" />
-
+    <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
       <View className="bg-white px-5 py-4 border-b border-gray-200">
-        <Text className="text-xl font-semibold text-gray-900">
-          My Attendance
-        </Text>
-        <Text className="text-sm text-gray-600 mt-1">
-          Track your attendance record
-        </Text>
-      </View>
-
-      {/* Tab Navigation */}
-      <View className="bg-white px-5 py-3 border-b border-gray-200">
-        <View className="flex-row bg-gray-100 rounded-lg p-1">
-          <TouchableOpacity
-            className={`flex-1 py-2 px-4 rounded-md ${
-              selectedTab === "overview" ? "bg-white shadow-sm" : ""
-            }`}
-            onPress={() => setSelectedTab("overview")}
-          >
-            <Text
-              className={`text-center text-sm font-medium ${
-                selectedTab === "overview" ? "text-blue-600" : "text-gray-600"
-              }`}
+        <View className="flex-row items-center">
+          {selectedSubject && (
+            <TouchableOpacity
+              onPress={() => setSelectedSubject(null)}
+              className="mr-3"
             >
-              Overview
+              <MaterialIcons name="arrow-back" size={24} color="#374151" />
+            </TouchableOpacity>
+          )}
+          <View className="flex-1">
+            <Text className="text-xl font-semibold text-gray-900">
+              {selectedSubject ? selectedSubject : "My Attendance"}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className={`flex-1 py-2 px-4 rounded-md ${
-              selectedTab === "subjects" ? "bg-white shadow-sm" : ""
-            }`}
-            onPress={() => setSelectedTab("subjects")}
-          >
-            <Text
-              className={`text-center text-sm font-medium ${
-                selectedTab === "subjects" ? "text-blue-600" : "text-gray-600"
-              }`}
-            >
-              By Subject
+            <Text className="text-sm text-gray-600 mt-1">
+              {selectedSubject
+                ? "Lecture attendance history"
+                : "Track your attendance record"}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className={`flex-1 py-2 px-4 rounded-md ${
-              selectedTab === "history" ? "bg-white shadow-sm" : ""
-            }`}
-            onPress={() => setSelectedTab("history")}
-          >
-            <Text
-              className={`text-center text-sm font-medium ${
-                selectedTab === "history" ? "text-blue-600" : "text-gray-600"
-              }`}
-            >
-              History
-            </Text>
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
 
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
-      >
-        {selectedTab === "overview" && (
+      <ScrollView className="flex-1">
+        {selectedSubject ? (
+          /* Subject Detail View */
+          <View className="bg-white">
+            {(mockData.subjectLectures as any)[selectedSubject]?.map(
+              (lecture: any, index: number) => (
+                <View
+                  key={lecture.id}
+                  className="flex-row items-center px-5 py-4 border-b border-gray-100"
+                >
+                  {/* Status Indicator */}
+                  <View className="mr-4">
+                    <View
+                      className={`w-8 h-8 rounded-md items-center justify-center ${
+                        lecture.status === "present"
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                    >
+                      <Text className="text-white font-bold text-lg">P</Text>
+                    </View>
+                    <View className="w-1 h-4 bg-green-500 ml-3.5 mt-1" />
+                  </View>
+
+                  {/* Lecture Details */}
+                  <View className="flex-1">
+                    <Text className="text-base font-medium text-gray-900 mb-1">
+                      {lecture.date}{" "}
+                      <Text className="text-gray-500 font-normal">
+                        {lecture.time}
+                      </Text>
+                    </Text>
+                    <Text className="text-sm text-orange-500">
+                      {lecture.faculty}
+                    </Text>
+                  </View>
+                </View>
+              )
+            )}
+          </View>
+        ) : (
+          /* Main Overview */
           <>
-            {/* Overall Statistics */}
-            <View className="bg-white rounded-xl p-5 mb-6 shadow-md">
+            {/* Overview Section */}
+            <View className="bg-white px-5 py-4">
               <Text className="text-lg font-semibold text-gray-900 mb-4">
-                Overall Attendance
+                Overview
               </Text>
 
-              <View className="items-center mb-4">
-                <View
-                  className={`w-32 h-32 rounded-full items-center justify-center ${getAttendanceBgColor(attendanceData.overall.percentage)}`}
-                >
-                  <Text
-                    className={`text-3xl font-bold ${getAttendanceColor(attendanceData.overall.percentage)}`}
+              {/* Overall Stats */}
+              <View className="flex-row justify-between items-center mb-6 p-4 bg-blue-50 rounded-lg">
+                <View>
+                  <Text className="text-sm text-gray-600">
+                    Overall Attendance
+                  </Text>
+                  <Text className="text-2xl font-bold text-blue-600 mt-1">
+                    {mockData.overview.overall.percentage}%
+                  </Text>
+                  <Text className="text-xs text-gray-500 mt-1">
+                    {mockData.overview.overall.presentDays} /{" "}
+                    {mockData.overview.overall.totalDays} days
+                  </Text>
+                </View>
+                <View className="w-16 h-16 rounded-full bg-blue-100 items-center justify-center">
+                  <Text className="text-sm font-bold text-blue-600">
+                    {mockData.overview.overall.percentage}%
+                  </Text>
+                </View>
+              </View>
+
+              {/* This Month Stats */}
+              <View className="flex-row justify-between mb-6">
+                <View className="flex-1 mr-2">
+                  <View
+                    className={`p-4 rounded-lg border ${getAttendanceBgColor(mockData.overview.thisMonth.percentage)}`}
                   >
-                    {attendanceData.overall.percentage}%
-                  </Text>
-                  <Text className="text-sm text-gray-600 mt-1">Attendance</Text>
+                    <Text className="text-sm text-gray-600">This Month</Text>
+                    <Text
+                      className={`text-xl font-bold mt-1 ${getAttendanceColor(mockData.overview.thisMonth.percentage)}`}
+                    >
+                      {mockData.overview.thisMonth.percentage}%
+                    </Text>
+                    <Text className="text-xs text-gray-500 mt-1">
+                      {mockData.overview.thisMonth.presentDays} /{" "}
+                      {mockData.overview.thisMonth.totalDays} days
+                    </Text>
+                  </View>
+                </View>
+                <View className="flex-1 ml-2">
+                  <View
+                    className={`p-4 rounded-lg border ${getAttendanceBgColor(mockData.overview.thisWeek.percentage)}`}
+                  >
+                    <Text className="text-sm text-gray-600">This Week</Text>
+                    <Text
+                      className={`text-xl font-bold mt-1 ${getAttendanceColor(mockData.overview.thisWeek.percentage)}`}
+                    >
+                      {mockData.overview.thisWeek.percentage}%
+                    </Text>
+                    <Text className="text-xs text-gray-500 mt-1">
+                      {mockData.overview.thisWeek.presentDays} /{" "}
+                      {mockData.overview.thisWeek.totalDays} days
+                    </Text>
+                  </View>
                 </View>
               </View>
-
-              <View className="flex-row justify-between">
-                <View className="items-center flex-1">
-                  <Text className="text-xl font-bold text-blue-500">
-                    {attendanceData.overall.attendedClasses}
-                  </Text>
-                  <Text className="text-xs text-gray-600 text-center">
-                    Classes Attended
-                  </Text>
-                </View>
-                <View className="items-center flex-1">
-                  <Text className="text-xl font-bold text-blue-500">
-                    {attendanceData.overall.totalClasses}
-                  </Text>
-                  <Text className="text-xs text-gray-600 text-center">
-                    Total Classes
-                  </Text>
-                </View>
-                <View className="items-center flex-1">
-                  <Text className="text-xl font-bold text-blue-500">
-                    {attendanceData.overall.target}%
-                  </Text>
-                  <Text className="text-xs text-gray-600 text-center">
-                    Required Min.
-                  </Text>
-                </View>
-              </View>
-
-              {attendanceData.overall.percentage <
-                attendanceData.overall.target && (
-                <View className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                  <Text className="text-sm text-red-600 font-medium">
-                    ⚠️ Warning: Your attendance is below the required minimum of{" "}
-                    {attendanceData.overall.target}%
-                  </Text>
-                </View>
-              )}
             </View>
 
-            {/* Quick Stats */}
-            <View className="flex-row justify-between mb-6">
-              <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-                <MaterialIcons name="today" size={24} color="#3b82f6" />
-                <Text className="text-lg font-bold text-gray-900 mt-2">5</Text>
-                <Text className="text-xs text-gray-600 text-center">
-                  Classes This Week
-                </Text>
-              </View>
-              <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-                <MaterialIcons name="trending-up" size={24} color="#10b981" />
-                <Text className="text-lg font-bold text-gray-900 mt-2">
-                  +2%
-                </Text>
-                <Text className="text-xs text-gray-600 text-center">
-                  This Month
-                </Text>
-              </View>
-              <View className="flex-1 bg-white rounded-xl p-4 mx-1 items-center shadow-md">
-                <MaterialIcons
-                  name="calendar-month"
-                  size={24}
-                  color="#f59e0b"
-                />
-                <Text className="text-lg font-bold text-gray-900 mt-2">18</Text>
-                <Text className="text-xs text-gray-600 text-center">
-                  Days Left
-                </Text>
-              </View>
-            </View>
-          </>
-        )}
+            {/* By Subject Section */}
+            <View className="bg-white px-5 py-4 border-t border-gray-200">
+              <Text className="text-lg font-semibold text-gray-900 mb-4">
+                By Subject
+              </Text>
 
-        {selectedTab === "subjects" && (
-          <View className="space-y-4">
-            {attendanceData.subjects.map((subject) => (
-              <View
-                key={subject.id}
-                className="bg-white rounded-xl p-4 shadow-md"
-              >
-                <View className="flex-row justify-between items-start mb-3">
-                  <View className="flex-1">
-                    <Text className="text-base font-semibold text-gray-900">
+              {mockData.subjects.map((subject, index) => (
+                <TouchableOpacity
+                  key={index}
+                  className="mb-4 p-4 bg-gray-50 rounded-lg"
+                  onPress={() => setSelectedSubject(subject.name)}
+                >
+                  <View className="flex-row justify-between items-center mb-2">
+                    <Text className="text-base font-medium text-gray-900">
                       {subject.name}
                     </Text>
-                    <Text className="text-sm text-gray-600">
-                      {subject.instructor}
-                    </Text>
-                  </View>
-                  <View
-                    className={`px-3 py-1 rounded-full ${getAttendanceBgColor(subject.percentage)}`}
-                  >
-                    <Text
-                      className={`text-sm font-semibold ${getAttendanceColor(subject.percentage)}`}
-                    >
-                      {subject.percentage}%
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="flex-row justify-between items-center">
-                  <Text className="text-sm text-gray-600">
-                    {subject.attendedClasses}/{subject.totalClasses} classes
-                  </Text>
-                  <Text className="text-sm text-gray-600">
-                    Last attended: {formatDate(subject.lastAttended)}
-                  </Text>
-                </View>
-
-                {/* Progress Bar */}
-                <View className="mt-3">
-                  <View className="w-full h-2 bg-gray-200 rounded-full">
-                    <View
-                      className={`h-2 rounded-full ${
-                        subject.percentage >= 85
-                          ? "bg-green-500"
-                          : subject.percentage >= 75
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                      }`}
-                      style={{ width: `${subject.percentage}%` }}
-                    />
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {selectedTab === "history" && (
-          <View className="space-y-3">
-            <Text className="text-lg font-semibold text-gray-900 mb-2">
-              Recent Classes
-            </Text>
-            {attendanceData.recentClasses.map((class_item) => (
-              <View
-                key={class_item.id}
-                className="bg-white rounded-xl p-4 shadow-md"
-              >
-                <View className="flex-row justify-between items-start">
-                  <View className="flex-1">
-                    <Text className="text-base font-semibold text-gray-900">
-                      {class_item.subject}
-                    </Text>
-                    <Text className="text-sm text-gray-600 mt-1">
-                      {class_item.topic}
-                    </Text>
-                    <Text className="text-sm text-gray-500 mt-1">
-                      {formatDate(class_item.date)} • {class_item.time}
-                    </Text>
-                  </View>
-                  <View className="items-end">
-                    <View
-                      className={`w-8 h-8 rounded-full items-center justify-center ${getStatusColor(class_item.status)}`}
-                    >
+                    <View className="flex-row items-center">
+                      <Text
+                        className={`text-lg font-bold ${getAttendanceColor(subject.percentage)} mr-2`}
+                      >
+                        {subject.percentage}%
+                      </Text>
                       <MaterialIcons
-                        name={getStatusIcon(class_item.status)}
-                        size={16}
-                        color="white"
+                        name="chevron-right"
+                        size={20}
+                        color="#9CA3AF"
                       />
                     </View>
+                  </View>
+                  <View className="flex-row justify-between text-sm text-gray-600">
+                    <Text>Present: {subject.presentClasses}</Text>
+                    <Text>Total: {subject.totalClasses}</Text>
+                  </View>
+                  <View className="flex-row justify-between text-xs text-gray-500 mt-1">
+                    <Text>Required: {subject.requiredAttendance}%</Text>
                     <Text
-                      className={`text-xs font-medium mt-1 ${
-                        class_item.status === "present"
+                      className={
+                        subject.status === "Good"
                           ? "text-green-600"
                           : "text-red-600"
-                      }`}
+                      }
                     >
-                      {class_item.status === "present" ? "Present" : "Absent"}
+                      {subject.status}
                     </Text>
                   </View>
-                </View>
-              </View>
-            ))}
-          </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
         )}
       </ScrollView>
     </SafeAreaView>

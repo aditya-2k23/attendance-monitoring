@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/utils/supabase";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import {
@@ -39,6 +40,7 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
   });
   const [loading, setLoading] = useState(false);
 
+  // ------------------ Helpers ------------------
   const resetForm = () =>
     setNewUser({
       name: "",
@@ -53,140 +55,288 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
       adminPassword: "",
     });
 
+  /**
+   * Validate the user payload BEFORE any network calls / uploads.
+   * Returns an array of issues; empty array means ok.
+   */
+  const validateNewUser = () => {
+    const errs: string[] = [];
+    const {
+      name,
+      email,
+      department,
+      role,
+      userId,
+      enrollmentYear,
+      tempPassword,
+      adminPassword,
+      phone,
+    } = newUser;
+
+    if (!name.trim()) errs.push("Full name is required.");
+    if (name.trim().length < 3)
+      errs.push("Full name must be at least 3 characters.");
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) errs.push("Email is required.");
+    else if (!emailRegex.test(email)) errs.push("Email format is invalid.");
+
+    if (!department.trim()) errs.push("Department is required.");
+
+    if (role === "teacher" && !userId.trim())
+      errs.push("Teacher code is required for teachers.");
+
+    // Enrollment year basic sanity (allow current year +/- 6 for flexibility)
+    const currentYear = new Date().getFullYear();
+    if (role === "student") {
+      if (!enrollmentYear || isNaN(enrollmentYear))
+        errs.push("Enrollment year is invalid.");
+      else if (
+        enrollmentYear < currentYear - 6 ||
+        enrollmentYear > currentYear + 1
+      )
+        errs.push("Enrollment year seems out of acceptable range.");
+    }
+
+    if (!tempPassword) errs.push("Temporary password is required.");
+    else if (tempPassword.length < 6)
+      errs.push("Temporary password must be at least 6 characters.");
+    else {
+      // Light complexity suggestion (optional)
+      const hasLetter = /[A-Za-z]/.test(tempPassword);
+      const hasNumber = /[0-9]/.test(tempPassword);
+      if (!(hasLetter && hasNumber)) {
+        errs.push(
+          "Temporary password should include letters and numbers for security."
+        );
+      }
+    }
+
+    if (!adminPassword) errs.push("Admin password confirmation is required.");
+
+    if (phone && !/^\+?[0-9]{7,15}$/.test(phone))
+      errs.push(
+        "Phone number format is invalid (digits only, 7-15 length, optional +)."
+      );
+
+    return errs;
+  };
+
   const showPhotoOptions = () => {
-    Alert.alert("Add Photo", "Choose how you want to add a photo", [
-      { text: "Take Photo", onPress: handleTakePhoto },
-      { text: "Choose from Gallery", onPress: handleSelectPhoto },
-      { text: "Cancel", style: "cancel" },
-    ]);
+    Alert.alert(
+      "📸 Add Photo",
+      "Choose how you'd like to add a profile photo for the new user:",
+      [
+        {
+          text: "📷 Take Photo",
+          onPress: handleTakePhoto,
+          style: "default",
+        },
+        {
+          text: "🖼️ Choose from Gallery",
+          onPress: handleSelectPhoto,
+          style: "default",
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleTakePhoto = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (permissionResult.granted === false) {
-      Alert.alert("Permission Required", "Camera permission is needed.");
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-    if (!result.canceled && result.assets?.length) {
-      setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+    try {
+      const permissionResult =
+        await ImagePicker.requestCameraPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "📷 Camera Permission Required",
+          "Please allow camera access in your device settings to take photos.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Open Settings",
+              onPress: () => ImagePicker.requestCameraPermissionsAsync(),
+            },
+          ]
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: false,
+      });
+
+      if (!result.canceled && result.assets?.length) {
+        setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+      }
+    } catch (error) {
+      console.error("Camera error:", error);
+      Alert.alert("Camera Error", "Failed to access camera. Please try again.");
     }
   };
 
   const handleSelectPhoto = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      Alert.alert("Permission Required", "Photo library permission is needed.");
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-    if (!result.canceled && result.assets?.length) {
-      setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "🖼️ Photo Library Permission Required",
+          "Please allow photo library access in your device settings to select photos.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Open Settings",
+              onPress: () => ImagePicker.requestMediaLibraryPermissionsAsync(),
+            },
+          ]
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: false,
+      });
+
+      if (!result.canceled && result.assets?.length) {
+        setNewUser({ ...newUser, photoUri: result.assets[0].uri });
+      }
+    } catch (error) {
+      console.error("Gallery error:", error);
+      Alert.alert(
+        "Gallery Error",
+        "Failed to access photo library. Please try again."
+      );
     }
   };
 
   async function uploadPhotoToSupabase(uri: string | null) {
-    if (!uri) return null;
+    if (!uri) return null; // no photo chosen, that's fine
+    const filename = `${newUser.role}-${uuid.v4()}.jpg`;
     try {
       const response = await fetch(uri);
-      const blob = await response.blob();
-      const filename = `${newUser.role}-${uuid.v4()}.jpg`;
+      const arrayBuffer = await response.arrayBuffer();
+
       const { error } = await supabase.storage
-        .from("user-photos") // ensure this bucket exists
-        .upload(filename, blob, { upsert: true });
+        .from("student-photos")
+        .upload(filename, arrayBuffer, {
+          upsert: true,
+          contentType: "image/jpeg",
+        });
 
       if (error) {
         console.error("Supabase upload error:", error);
-        return null;
+        throw new Error("Failed to upload photo. Please try again.");
       }
 
-      // If bucket is public:
       const publicUrl = supabase.storage
-        .from("user-photos")
+        .from("student-photos")
         .getPublicUrl(filename).data.publicUrl;
-      return publicUrl || null;
-    } catch (err) {
+      if (!publicUrl) throw new Error("Could not obtain public photo URL.");
+      return publicUrl;
+    } catch (err: any) {
       console.error("uploadPhotoToSupabase error:", err);
-      return null;
+      throw err;
     }
   }
 
   const handleAddUser = async () => {
-    // Enhanced validation
-    if (!newUser.name || !newUser.email || !newUser.department) {
-      Alert.alert("Error", "Please fill all required fields.");
-      return;
-    }
-
-    // Teacher validation - teacher_code is required for teachers
-    if (newUser.role === "teacher" && !newUser.userId) {
-      Alert.alert("Error", "Teacher code is required for teachers.");
-      return;
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newUser.email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
-      return;
-    }
-
-    if (!newUser.tempPassword) {
-      Alert.alert("Error", "Please set a temporary password for the new user.");
-      return;
-    }
-    if (newUser.tempPassword.length < 6) {
-      Alert.alert(
-        "Error",
-        "Temporary password must be at least 6 characters long."
-      );
-      return;
-    }
-    if (!newUser.adminPassword) {
-      Alert.alert("Error", "Please enter your admin password to confirm.");
+    // 1) Local validations
+    const validationErrors = validateNewUser();
+    if (validationErrors.length) {
+      Alert.alert("Validation Errors", validationErrors.join("\n"));
       return;
     }
 
     setLoading(true);
-
     try {
-      // 0) grab admin session (to get admin email)
+      // 2) Ensure current session (admin) & capture email early
       const { data: sessionData } = await supabase.auth.getSession();
       const adminSession = (sessionData as any)?.session;
       if (!adminSession) {
         Alert.alert("Not signed in", "Please sign in as admin to add users.");
-        setLoading(false);
         return;
       }
       const adminEmail = adminSession.user?.email;
       if (!adminEmail) {
         Alert.alert("Error", "Can't determine admin email from session.");
-        setLoading(false);
         return;
       }
 
-      // 1) optionally upload photo (as admin, before creating new user)
-      const photo_url = await uploadPhotoToSupabase(newUser.photoUri);
+      // 3) Pre-empt uniqueness (email in existing profile tables & teacher_code)
+      // NOTE: This does NOT guarantee uniqueness in auth.users. True atomic user creation
+      // should be implemented via a backend Edge Function with service role.
+      const emailLower = newUser.email.toLowerCase();
+      const { data: existingStudent, error: studentEmailErr } = await supabase
+        .from("students")
+        .select("id")
+        .eq("email", emailLower)
+        .maybeSingle();
+      if (studentEmailErr)
+        console.warn("students email lookup error", studentEmailErr);
+      const { data: existingTeacher, error: teacherEmailErr } = await supabase
+        .from("teachers")
+        .select("id")
+        .eq("email", emailLower)
+        .maybeSingle();
+      if (teacherEmailErr)
+        console.warn("teachers email lookup error", teacherEmailErr);
+      if (existingStudent || existingTeacher) {
+        Alert.alert(
+          "Duplicate Email",
+          "A profile with this email already exists."
+        );
+        return;
+      }
 
-      // 2) create the new auth user via client-side signUp
-      // This will sign the app in as the new user temporarily.
+      if (newUser.role === "teacher" && newUser.userId) {
+        const { data: teacherCodeRow, error: teacherCodeErr } = await supabase
+          .from("teachers")
+          .select("id")
+          .eq("teacher_code", newUser.userId)
+          .maybeSingle();
+        if (teacherCodeErr)
+          console.warn("teacher code lookup error", teacherCodeErr);
+        if (teacherCodeRow) {
+          Alert.alert(
+            "Duplicate Teacher Code",
+            "That teacher code is already in use."
+          );
+          return;
+        }
+      }
+
+      // 4) Upload photo (if selected) BEFORE user creation, treat failure as blocking
+      let photo_url: string | null = null;
+      if (newUser.photoUri) {
+        try {
+          photo_url = await uploadPhotoToSupabase(newUser.photoUri);
+        } catch (uploadErr: any) {
+          Alert.alert(
+            "Photo Upload Failed",
+            uploadErr?.message || "Could not upload photo."
+          );
+          return; // abort completely -> NO auth user created
+        }
+      }
+
+      // 5) Only NOW create the auth user (last potential failing step before profile insert)
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp(
         {
           email: newUser.email,
           password: newUser.tempPassword,
           options: {
-            emailRedirectTo: undefined, // Disable email verification
             data: {
               full_name: newUser.name,
               role: newUser.role,
@@ -195,93 +345,76 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
           },
         }
       );
-
       if (signUpErr) {
         console.error("signUp error", signUpErr);
         Alert.alert(
-          "Error creating auth user",
-          signUpErr.message || String(signUpErr)
+          "Auth Error",
+          signUpErr.message || "Failed to create auth user."
         );
-        setLoading(false);
-        return;
+        return; // abort (no profile insert attempted)
       }
 
-      // signUp usually returns created user in signUpData.user (or data.user)
       const createdUserId =
         (signUpData as any)?.user?.id || (signUpData as any)?.id;
       if (!createdUserId) {
-        console.warn(
-          "Could not get created user id from signUp response:",
-          signUpData
-        );
         Alert.alert(
           "Warning",
-          "User created but couldn't read user id. Please check in Supabase console."
+          "User created but user id missing in response. Profile not inserted."
         );
+        return;
       }
 
-      // 3) immediately sign back in as admin using admin email + adminPassword provided
+      // 6) Re-auth as admin to insert profile row (restore admin session)
       const { error: signInBackErr } = await supabase.auth.signInWithPassword({
         email: adminEmail,
         password: newUser.adminPassword,
       });
-
       if (signInBackErr) {
         console.error("Failed to sign back in as admin", signInBackErr);
         Alert.alert(
-          "Error",
-          "Failed to restore admin session. You may need to login again manually."
+          "Session Error",
+          "Auth user created but failed to restore admin session."
         );
-        setLoading(false);
+        // At this point we cannot roll back the auth user (requires service role). Inform admin.
         return;
       }
 
-      // 4) now we're back as admin — insert profile row into students or teachers table
+      // 7) Insert profile row
       const profilePayload: any = {
         auth_user_id: createdUserId,
         full_name: newUser.name,
-        email: newUser.email,
+        email: emailLower,
         phone: newUser.phone || null,
         department: newUser.department,
-        photo_url: photo_url || null,
+        photo_url: photo_url,
         is_active: true,
       };
-
-      // Add role-specific fields
-      if (newUser.role === "student") {
+      if (newUser.role === "student")
         profilePayload.enrollment_year = newUser.enrollmentYear;
-      }
-      if (newUser.role === "teacher" && newUser.userId) {
+      if (newUser.role === "teacher" && newUser.userId)
         profilePayload.teacher_code = newUser.userId;
-      }
 
       const tableName = newUser.role === "student" ? "students" : "teachers";
       const { error: insertErr } = await supabase
         .from(tableName)
         .insert([profilePayload]);
-
       if (insertErr) {
         console.error("Profile insert error", insertErr);
         Alert.alert(
-          "Error",
-          "Failed to insert profile row: " + insertErr.message
+          "Profile Error",
+          "Auth user created but profile insertion failed. Please fix manually."
         );
-        setLoading(false);
-        return;
+        return; // Cannot rollback auth user client-side
       }
 
-      // success
       Alert.alert("Success", `${newUser.role} ${newUser.name} added.`);
-
-      // Refresh the admin user context to ensure they stay logged in
       await refreshUser();
-
       onCreated?.({ auth_user_id: createdUserId });
       resetForm();
       onClose();
     } catch (err) {
       console.error(err);
-      Alert.alert("Error", "Something went wrong while creating user.");
+      Alert.alert("Error", "Unexpected error creating user.");
     } finally {
       setLoading(false);
     }
@@ -303,7 +436,7 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
             {/* Header */}
             <View className="items-center mb-4">
               <View className="w-12 h-12 rounded-full bg-blue-50 justify-center items-center">
-                <Text className="text-xl">👥</Text>
+                <MaterialIcons name="person-add" size={28} color="#3B82F6" />
               </View>
               <Text className="text-xl font-bold text-gray-800">
                 Add New User
@@ -328,7 +461,11 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
-                  <Text className="text-lg mb-0.5">👨‍🏫</Text>
+                  <FontAwesome
+                    name={newUser.role === "teacher" ? "user" : "user-o"}
+                    size={24}
+                    color={newUser.role === "teacher" ? "#fff" : "#4B5563"}
+                  />
                   <Text
                     className={`font-semibold text-sm ${
                       newUser.role === "teacher"
@@ -347,7 +484,11 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
-                  <Text className="text-lg mb-0.5">🎓</Text>
+                  <FontAwesome
+                    name="graduation-cap"
+                    size={24}
+                    color={newUser.role === "student" ? "#fff" : "#4B5563"}
+                  />
                   <Text
                     className={`font-semibold text-sm ${
                       newUser.role === "student"
@@ -363,30 +504,61 @@ export default function AddUser({ visible, onClose, onCreated }: AddUserProps) {
 
             {/* Photo Section */}
             <View className="items-center mb-4.5">
+              <Text className="text-base font-semibold text-gray-700 mb-3">
+                Profile Photo
+              </Text>
               {newUser.photoUri ? (
                 <View className="items-center">
-                  <Image
-                    source={{ uri: newUser.photoUri }}
-                    className="w-20 h-20 rounded-full mb-2 border-2 border-gray-200"
-                  />
-                  <TouchableOpacity
-                    onPress={showPhotoOptions}
-                    className="px-3 py-1.5 bg-gray-100 rounded-2xl border border-gray-300"
-                  >
-                    <Text className="text-gray-700 font-medium text-xs">
-                      Change Photo
-                    </Text>
-                  </TouchableOpacity>
+                  <View className="relative">
+                    <Image
+                      source={{ uri: newUser.photoUri }}
+                      className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-sm"
+                    />
+                    <View className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-2 border-white justify-center items-center">
+                      <Text className="text-white text-xs font-bold">✓</Text>
+                    </View>
+                  </View>
+                  <View className="flex-row gap-2 mt-3">
+                    <TouchableOpacity
+                      onPress={showPhotoOptions}
+                      className="px-4 py-2 bg-blue-50 rounded-xl border border-blue-200 flex-row items-center"
+                    >
+                      <Text className="text-blue-600 font-medium text-sm">
+                        Change
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setNewUser({ ...newUser, photoUri: null })}
+                      className="px-4 py-2 bg-red-50 rounded-xl border border-red-200 flex-row items-center"
+                    >
+                      <Text className="text-red-600 font-medium text-sm">
+                        Remove
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ) : (
                 <TouchableOpacity
                   onPress={showPhotoOptions}
-                  className="w-20 h-20 rounded-full bg-gray-50 border-2 border-gray-200 border-dashed justify-center items-center mb-2"
+                  className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 border-dashed justify-center items-center shadow-sm active:scale-95"
+                  style={{
+                    transform: [{ scale: 1 }],
+                    shadowColor: "#3B82F6",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                  }}
                 >
-                  <Text className="text-2xl">📷</Text>
-                  <Text className="text-xs text-gray-500 text-center">
-                    Add Photo
-                  </Text>
+                  <View className="items-center">
+                    <MaterialIcons
+                      name="add-a-photo"
+                      size={30}
+                      color="#3B82F6"
+                    />
+                    <Text className="text-xs text-blue-500 font-medium text-center px-2">
+                      Add Photo
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               )}
             </View>
