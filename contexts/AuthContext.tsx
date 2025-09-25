@@ -58,6 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check for existing session on app start
   useEffect(() => {
+    // Skip auth check during SSR
+    if (typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+
     const checkSession = async () => {
       try {
         const {

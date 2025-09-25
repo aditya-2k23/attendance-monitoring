@@ -1,4 +1,4 @@
-import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 export default function FacultyLayout() {
@@ -36,12 +36,12 @@ export default function FacultyLayout() {
         }}
       />
       <Tabs.Screen
-        name="tasks"
+        name="timetable"
         options={{
-          title: "Tasks",
+          title: "Timetable",
           tabBarIcon: ({ color, focused, size }) => (
-            <MaterialIcons
-              name={focused ? "task-alt" : "task"}
+            <Ionicons
+              name={focused ? "calendar" : "calendar-outline"}
               size={size || 24}
               color={color}
             />
@@ -49,13 +49,26 @@ export default function FacultyLayout() {
         }}
       />
       <Tabs.Screen
-        name="classroom"
+        name="subjects"
         options={{
-          title: "Classroom",
+          title: "Subjects",
           tabBarIcon: ({ color, focused, size }) => (
-            <FontAwesome5
-              name={focused ? "chalkboard-teacher" : "chalkboard"}
-              size={size || 22}
+            <MaterialIcons
+              name={focused ? "subject" : "menu-book"}
+              size={size || 24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          title: "Reports",
+          tabBarIcon: ({ color, focused, size }) => (
+            <MaterialIcons
+              name={focused ? "assessment" : "bar-chart"}
+              size={size || 24}
               color={color}
             />
           ),

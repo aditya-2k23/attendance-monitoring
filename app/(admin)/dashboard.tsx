@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AttendanceStats, FacultyPerformance, User } from "../../types/admin";
 import AddUser from "./components/AddUser";
 import CourseManagement from "./components/CourseManagement";
 import EnrollmentManagement from "./components/EnrollmentManagement";
@@ -19,7 +20,6 @@ import Reports from "./components/Reports";
 import SessionScheduler from "./components/SessionScheduler";
 import TeacherAssignment from "./components/TeacherAssignment";
 import Users from "./components/Users";
-import { AttendanceStats, User } from "./types";
 
 export default function AdminDashboard() {
   const [selectedSection, setSelectedSection] = useState<string>("users");

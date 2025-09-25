@@ -20,14 +20,14 @@ export default function Index() {
   }
 
   if (user.role === "student") {
-    return <Redirect href="/(student)" />;
+    return <Redirect href={"/(student)" as any} />;
   }
 
   if (user.role === "admin") {
     // Land admins directly on the Admin tab inside the teacher/admin tabs group
-    return <Redirect href="/(admin)/dashboard" />;
+    return <Redirect href={"/(admin)/dashboard" as any} />;
   }
 
   // Teachers (and other non-student, non-admin roles) go to the default tabs
-  return <Redirect href="/(faculty)" />;
+  return <Redirect href={"/(faculty)" as any} />;
 }
